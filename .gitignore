@@ -1,0 +1,6 @@
+#IDE SETTINGS
+.idea
+
+#Results SeoFrog job
+seo_results/*.*
+!seo_results/.gitkeep
