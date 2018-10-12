@@ -1,0 +1,63 @@
+server {
+	listen 8080;
+	listen [::]:8080;
+
+	set	$rootPath 	"/var/www/test.loc";
+	set     $indexFile	"index.php";
+
+	root 	$rootPath;
+
+	index   $indexFile index.html;
+
+	server_name test.loc www.test.loc;
+
+	location / {
+		root $rootPath/web;
+        	try_files $uri $uri/ /$indexFile?$args;
+
+		gzip on;
+		gzip_disable "msie6";
+		gzip_vary on;
+		gzip_proxied any;
+		gzip_comp_level 6;
+		gzip_buffers 16 8k;
+		gzip_http_version 1.1;
+		gzip_min_length 256;
+		gzip_types text/plain text/css application/json application/x-javascript text/xml application/javascript application/xml application/xml+rss text/javascript application/x-font-ttf font/opentype image/svg+xml image/x-icon;
+
+		location ~* ^/uploads/.+\.(php|php3|php4|php5)$ {
+		    deny all;
+		}
+
+		location ~ \.php$ {
+		    try_files $uri =404;
+
+		    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		    fastcgi_index $indexFile;
+
+		    fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
+
+		    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		    fastcgi_param PATH_INFO $fastcgi_path_info;
+		    include fastcgi_params;
+		}
+
+		location ~* \.(svg|jpg|jpeg|gif|png|swf|tiff|otf|ttf|woff|flv|ico|js|css|webp)$ {
+		        try_files $uri =404;
+		        expires 30d;
+		        add_header Cache-Control public;
+		        add_header Vary Accept-Encoding;
+		        add_header Access-Control-Allow-Origin "*";
+            	}
+	}
+
+	location ~ \.php {
+	   include fastcgi_params;
+	   fastcgi_pass unix:/var/run/php7-fpm.sock;
+	   fastcgi_param SCRIPT_FILENAME /app$fastcgi_script_name;
+	}
+
+	location ~ \.(tpl|xml|log)$ {
+	    deny all;
+}
+}
