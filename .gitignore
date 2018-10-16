@@ -1,6 +1,13 @@
 #IDE SETTINGS
 .idea
 
+#Vendor
+vendor/*
+
 #Results SeoFrog job
 seo_results/*.*
 !seo_results/.gitkeep
+
+#Config
+config/*
+!config/google_api_credentials.json.dist

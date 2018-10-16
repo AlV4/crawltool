@@ -1,4 +1,5 @@
 <?php
+require_once '../vendor/autoload.php';
 
 $resultFolder = '/var/www/test.loc/seo_results';
 
@@ -38,8 +39,15 @@ if ( empty( json_decode( shell_exec($conf['dockerCheckImageExists']) ) ) ){
     echo $conf['dockerBuildMsg'];
     throw new ErrorException();
 }
-//echo shell_exec( $conf['dockerRun'] );
+echo "Job started successfully, you will receive an email after process end.\n";
 
-$dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
+print_r( new Google_Client() );
+    
+session_write_close();
+fastcgi_finish_request();
 
-print_r($dirContent);
+//shell_exec( $conf['dockerRun'] );
+
+//$dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
+
+//file_put_contents("log.txt", print_r($dirContent, true), FILE_APPEND );
