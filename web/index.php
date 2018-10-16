@@ -38,4 +38,8 @@ if ( empty( json_decode( shell_exec($conf['dockerCheckImageExists']) ) ) ){
     echo $conf['dockerBuildMsg'];
     throw new ErrorException();
 }
-echo shell_exec( $conf['dockerRun'] );
+//echo shell_exec( $conf['dockerRun'] );
+
+$dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
+
+print_r($dirContent);
