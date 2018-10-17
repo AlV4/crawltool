@@ -1,66 +1,50 @@
 <?php
 
-require __DIR__ . '../vendor/autoload.php';
+require_once '../vendor/autoload.php';
+require_once '../config/config.php';
 
 if (php_sapi_name() != 'cli') {
     throw new Exception('This application must be run on the command line.');
 }
 
-/**
- * Returns an authorized API client.
- *
- * @return Google_Client the authorized client object
- * @throws Exception
- * @throws Google_Exception
- * @throws InvalidArgumentException
- * @throws LogicException
- */
-function getClient()
-{
-    $client = new Google_Client();
-    $client->setApplicationName('Google Sheets API PHP Quickstart');
-    $client->setScopes(Google_Service_Sheets::SPREADSHEETS_READONLY);
-    $client->setAuthConfig('credentials.json');
-    $client->setAccessType('offline');
-    $client->setPrompt('select_account consent');
+$client = new Google_Client();
+$client->setApplicationName('ScreamingFrog');
+$client->setScopes([ Google_Service_Sheets::SPREADSHEETS, "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file" ]);
+$client->setAuthConfig(CREDENTIALS_FILE);
+$client->setAccessType('offline');
+$client->setPrompt('consent');
 
-    // Load previously authorized token from a file, if it exists.
-    $tokenPath = 'token.json';
-    if (file_exists($tokenPath)) {
-        $accessToken = json_decode(file_get_contents($tokenPath), true);
-        $client->setAccessToken($accessToken);
-    }
-
-    // If there is no previous token or it's expired.
-    if ($client->isAccessTokenExpired()) {
-        // Refresh the token if possible, else fetch a new one.
-        if ($client->getRefreshToken()) {
-            $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-        } else {
-            // Request authorization from the user.
-            $authUrl = $client->createAuthUrl();
-            printf("Open the following link in your browser:\n%s\n", $authUrl);
-            print 'Enter verification code: ';
-            $authCode = trim(fgets(STDIN));
-
-            // Exchange authorization code for an access token.
-            $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
-            $client->setAccessToken($accessToken);
-
-            // Check to see if there was an error.
-            if (array_key_exists('error', $accessToken)) {
-                throw new Exception(join(', ', $accessToken));
-            }
-        }
-        // Save the token to a file.
-        if (!file_exists(dirname($tokenPath))) {
-            mkdir(dirname($tokenPath), 0700, true);
-        }
-        file_put_contents($tokenPath, json_encode($client->getAccessToken()));
-    }
-    return $client;
+// Load previously authorized token from a file, if it exists.
+if (file_exists(TOKEN)) {
+    $accessToken = json_decode(file_get_contents(TOKEN), true);
+    $client->setAccessToken($accessToken);
 }
 
+// If there is no previous token or it's expired.
+if ($client->isAccessTokenExpired()) {
+    // Refresh the token if possible, else fetch a new one.
+    if ($client->getRefreshToken()) {
+        $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+    } else {
+        // Request authorization from the user.
+        $authUrl = $client->createAuthUrl();
+        printf("Open the following link in your browser:\n%s\n", $authUrl);
+        print 'Enter verification code: ';
+        $authCode = trim(fgets(STDIN));
 
-// Get the API client and construct the service object.
-$client = getClient();
+        // Exchange authorization code for an access token.
+        $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
+        $client->setAccessToken($accessToken);
+
+        // Check to see if there was an error.
+        if (array_key_exists('error', $accessToken)) {
+            throw new Exception(join(', ', $accessToken));
+        }
+    }
+    // Save the token to a file.
+    if (!file_exists(dirname(TOKEN))) {
+        mkdir(dirname(TOKEN), 0700, true);
+    }
+    file_put_contents(TOKEN, json_encode($client->getAccessToken()));
+}
+print "Access granted!" . PHP_EOL;
