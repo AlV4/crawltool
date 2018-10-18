@@ -10,7 +10,7 @@ if ( ! filter_var($link, FILTER_VALIDATE_URL) ){
     throw new ErrorException();
 }
 
-$folder = strtr( $link, ['http://' => '', 'https://' => '', '.' => '_', '/' => ''] );
+$folder = strtr( $link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__'] );
 
 $resultFolder .= RESULT_FOLDER.DIRECTORY_SEPARATOR.$folder;
 
@@ -45,10 +45,9 @@ echo "Job started successfully, you will receive an email after process end.\n";
 session_write_close();
 fastcgi_finish_request();
 
-shell_exec( $conf['dockerRun'] );
+$resStr = shell_exec( $conf['dockerRun'] );
 
-chown($resultFolder, '$USER');
-chmod($resultFolder, 777);
+//log_to_file( $resStr );
 
 $client = getClient();
 
@@ -134,4 +133,11 @@ function getClient()
     }
 
     return $client;
+}
+
+function log_to_file( $data )
+{
+    if ( ! empty($data) ){
+        file_put_contents("log.txt", print_r($data , true), FILE_APPEND );
+    }
 }
