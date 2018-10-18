@@ -10,4 +10,5 @@ seo_results/*.*
 
 #Config
 config/*
-!config/google_api_credentials.json.dist
+!config/credentials.json.dist
+!config/config.php.local
