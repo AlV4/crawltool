@@ -10,5 +10,6 @@ seo_results/*.*
 
 #Config
 config/*
+etc/*
 !config/credentials.json.dist
 !config/config.php.local
