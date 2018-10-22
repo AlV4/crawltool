@@ -16,12 +16,18 @@ $resultFolder .= RESULT_FOLDER.DIRECTORY_SEPARATOR.$folder;
 
 $tabs = [
     "Internal:All",
-    "H1:All",
-    "H2:All",
     "Page Titles:All",
     "Page Titles:Duplicate",
+    "Page Titles:Missing",
     "Meta Description:All",
     "Meta Description:Duplicate",
+    "Meta Description:Missing",
+    "H1:All",
+    "H1:Duplicate",
+    "H1:Missing",
+    "H2:All",
+    "H2:Duplicate",
+    "H2:Missing",
 ];
 
 $allTabs = implode( ", ", $tabs );
