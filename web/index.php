@@ -14,6 +14,8 @@ $folder = strtr( $link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '
 
 $resultFolder .= RESULT_FOLDER.DIRECTORY_SEPARATOR.$folder;
 
+$dataFormat = 'csv';
+
 $tabs = [
     "Internal:All",
     "Page Titles:All",
@@ -34,7 +36,7 @@ $allTabs = implode( ", ", $tabs );
 
 $conf = [
     "dockerRun" =>
-        "docker run -v $resultFolder:/home/crawls screamingfrog --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format csv --export-tabs \"$allTabs\"",
+        "docker run -v $resultFolder:/home/crawls screamingfrog --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
     "dockerBuildMsg" =>
         "Need to build the docker image: 'docker build -t screamingfrog .'",
     "dockerCheckImageExists" =>
@@ -89,7 +91,7 @@ foreach ( $sheets as $sheet ) {
     $tabName = $sheet->getProperties()['title'];
     $insertRequest['requests'][] = [ 'pasteData' => [
         'coordinate' => [ "sheetId" => $id,  "rowIndex" => 0,  "columnIndex" => 0 ],
-        "data" => file_get_contents("$resultFolder/$tabName.csv" ),
+        "data" => file_get_contents("$resultFolder/$tabName.$dataFormat" ),
         "delimiter" => ","
     ] ];
 }
