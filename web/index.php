@@ -68,7 +68,13 @@ $fileTpl->setName( $folder );
 $copiedFile = $driveService->files->copy( TEMPLATE_SHEET_ID, $fileTpl );
 
 $firstSheetId = $sheetService->spreadsheets->get($copiedFile->getId())->getSheets()[0]->properties->sheetId;
-
+//=====================================
+//$scriptService = new Google_Service_Script($client);
+//$sheetFile = $sheetService->spreadsheets->get( $copiedFile->getId() );
+//$script = $scriptService->projects->get("1CrM3Fpi2OS8BgZK4rt19G__xwKse2Y_qR51IXcPGZzG7NbR-rU_WtFun");
+//print_r($scriptService->scripts->run($script->getScriptId()));die;
+//print_r($sheetFile);die;
+//=====================================
 $dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
 
 $createRequest = [];
