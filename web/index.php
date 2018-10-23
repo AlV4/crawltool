@@ -12,7 +12,7 @@ if ( ! filter_var($link, FILTER_VALIDATE_URL) ){
 
 $folder = strtr( $link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__'] );
 
-$resultFolder .= RESULT_FOLDER.DIRECTORY_SEPARATOR.$folder;
+$resultFolder = RESULT_FOLDER.DIRECTORY_SEPARATOR.$folder;
 
 $dataFormat = 'csv';
 
@@ -30,6 +30,7 @@ $tabs = [
     "H2:All",
     "H2:Duplicate",
     "H2:Missing",
+    "Images:Missing Alt Text"
 ];
 
 $allTabs = implode( ", ", $tabs );
@@ -113,7 +114,12 @@ function getClient()
 {
     $client = new Google_Client();
     $client->setApplicationName('ScreamingFrog');
-    $client->setScopes([ Google_Service_Sheets::SPREADSHEETS, "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file" ]);
+    $client->setScopes([
+        Google_Service_Sheets::SPREADSHEETS,
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/drive.file" ,
+        "https://www.googleapis.com/auth/script.projects"
+    ]);
     $client->setAuthConfig( CREDENTIALS_FILE );
     $client->setAccessType('offline');
 

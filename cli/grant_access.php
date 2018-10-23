@@ -9,7 +9,12 @@ if (php_sapi_name() != 'cli') {
 
 $client = new Google_Client();
 $client->setApplicationName('ScreamingFrog');
-$client->setScopes([ Google_Service_Sheets::SPREADSHEETS, "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file" ]);
+$client->setScopes([
+    Google_Service_Sheets::SPREADSHEETS,
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/script.projects"
+]);
 $client->setAuthConfig(CREDENTIALS_FILE);
 $client->setAccessType('offline');
 $client->setPrompt('consent');
