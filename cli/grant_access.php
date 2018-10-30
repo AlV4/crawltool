@@ -17,7 +17,7 @@ $client->setScopes([
 ]);
 $client->setAuthConfig(CREDENTIALS_FILE);
 $client->setAccessType('offline');
-$client->setPrompt('consent');
+$client->setPrompt('select_account consent');
 
 // Load previously authorized token from a file, if it exists.
 if (file_exists(TOKEN)) {

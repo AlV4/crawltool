@@ -51,61 +51,87 @@ if ( empty( json_decode( shell_exec($conf['dockerCheckImageExists']) ) ) ){
 
 echo "Job started successfully, you will receive an email after process end.\n";
 
-session_write_close();
-fastcgi_finish_request();
+//session_write_close();
+//fastcgi_finish_request();
 
-$resStr = shell_exec( $conf['dockerRun'] );
+$logs = [];
 
-//log_to_file( $resStr );
+//$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
 $client = getClient();
 
-$sheetService = new Google_Service_Sheets($client);
-$driveService = new Google_Service_Drive( $client );
+$sheetId = createSpreadSheet( $client, $folder, $resultFolder, $dataFormat );
 
-$fileTpl = new \Google_Service_Drive_DriveFile();
-$fileTpl->setName( $folder );
-$copiedFile = $driveService->files->copy( TEMPLATE_SHEET_ID, $fileTpl );
+$service = new Google_Service_Script($client);
 
-$firstSheetId = $sheetService->spreadsheets->get($copiedFile->getId())->getSheets()[0]->properties->sheetId;
-//=====================================
-//$scriptService = new Google_Service_Script($client);
-//$sheetFile = $sheetService->spreadsheets->get( $copiedFile->getId() );
-//$script = $scriptService->projects->get("1CrM3Fpi2OS8BgZK4rt19G__xwKse2Y_qR51IXcPGZzG7NbR-rU_WtFun");
-//print_r($scriptService->scripts->run($script->getScriptId()));die;
-//print_r($sheetFile);die;
-//=====================================
-$dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
+$request = new Google_Service_Script_ExecutionRequest();
+$request->setFunction(SCRIPT_FUNCTION_NAME );
+$request->setParameters([$sheetId]);
 
-$createRequest = [];
-foreach ( $dirContent as $tab ) { // add sheets with tab names according to export files
-    $createRequest['requests'][] = [
-        'addSheet' => [
-            'properties'=>[ 'title'=> substr( $tab, 0, strpos($tab, '.') )  ]
+try {
+    $result = $service->scripts->run( SCRIPT_ID, $request );
+}catch ( \Exception $e ){
+    $logs[] = $e->getMessage();
+}
+
+print_r( $logs );
+//log_to_file( $logs );
+
+/**
+ * @param Google_Client $client
+ * @param               $name
+ * @param               $resultFolder
+ * @param               $dataFormat
+ *
+ * @return string
+ */
+function createSpreadSheet( Google_Client $client, $name, $resultFolder,$dataFormat ){
+
+    $sheetService = new Google_Service_Sheets( $client );
+
+    $requestBody = new Google_Service_Sheets_Spreadsheet([
+        'properties' => [
+            'title' => $name
         ]
-    ];
-}
-$createRequest['requests'][] = [ 'deleteSheet' => [ 'sheetId' => $firstSheetId ] ]; // delete first unnecessary sheet, if needed
-try {
-    $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest($createRequest);
-    $result = $sheetService->spreadsheets->batchUpdate($copiedFile->getId(),$body);
-} catch(Exception $ignore) {}
-$sheets = $sheetService->spreadsheets->get($copiedFile->getId())->getSheets();
+    ]);
+    $fileSheet = $sheetService->spreadsheets->create($requestBody);
 
-$insertRequest = [];
-foreach ( $sheets as $sheet ) {
-    $id = $sheet->getProperties()['sheetId'];
-    $tabName = $sheet->getProperties()['title'];
-    $insertRequest['requests'][] = [ 'pasteData' => [
-        'coordinate' => [ "sheetId" => $id,  "rowIndex" => 0,  "columnIndex" => 0 ],
-        "data" => file_get_contents("$resultFolder/$tabName.$dataFormat" ),
-        "delimiter" => ","
-    ] ];
+    $firstSheetId = $sheetService->spreadsheets->get($fileSheet->getSpreadsheetId())->getSheets()[0]->properties->sheetId;
+
+    $dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
+
+    $updateRequest = [];
+    foreach ( $dirContent as $tab ) { // add sheets with tab names according to export files
+        $updateRequest['requests'][] = [
+            'addSheet' => [
+                'properties'=>[ 'title'=> substr( $tab, 0, strpos($tab, '.') )  ]
+            ]
+        ];
+    }
+    $updateRequest['requests'][] = [ 'deleteSheet' => [ 'sheetId' => $firstSheetId ] ]; // delete first unnecessary sheet, if needed
+    try {
+        $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest($updateRequest);
+        $result = $sheetService->spreadsheets->batchUpdate($fileSheet->getSpreadsheetId(),$body);
+    } catch(Exception $ignore) {}
+    $sheets = $sheetService->spreadsheets->get($fileSheet->getSpreadsheetId())->getSheets();
+
+    $insertRequest = [];
+    foreach ( $sheets as $sheet ) {
+        $id = $sheet->getProperties()['sheetId'];
+        $tabName = $sheet->getProperties()['title'];
+        $insertRequest['requests'][] = [ 'pasteData' => [
+            'coordinate' => [ "sheetId" => $id,  "rowIndex" => 0,  "columnIndex" => 0 ],
+            "data" => file_get_contents("$resultFolder/$tabName.$dataFormat" ),
+            "delimiter" => ","
+        ] ];
+    }
+    try {
+        $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest($insertRequest);
+        $result = $sheetService->spreadsheets->batchUpdate($fileSheet->getSpreadsheetId(),$body);
+    } catch(Exception $ignore) {}
+
+    return $fileSheet->getSpreadsheetId();
 }
-try {
-    $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest($insertRequest);
-    $result = $sheetService->spreadsheets->batchUpdate($copiedFile->getId(),$body);
-} catch(Exception $ignore) {}
 
 /**
  * Returns an authorized API client.
@@ -155,6 +181,9 @@ function getClient()
     return $client;
 }
 
+/**
+ * @param $data
+ */
 function log_to_file( $data )
 {
     if ( ! empty($data) ){
