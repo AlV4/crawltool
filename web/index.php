@@ -65,14 +65,27 @@ $sheetId = createSpreadSheet( $client, $folder, $resultFolder, $dataFormat );
 $service = new Google_Service_Script($client);
 
 $request = new Google_Service_Script_ExecutionRequest();
-$request->setFunction(SCRIPT_FUNCTION_NAME );
-$request->setParameters([$sheetId]);
 
-try {
-    $result = $service->scripts->run( SCRIPT_ID, $request );
-}catch ( \Exception $e ){
-    $logs[] = $e->getMessage();
+
+$functions = [
+    'recreateInputSSMgr',
+//    'screamingFrogDataComparisongMgr',
+//    'onPageSEOReportMngr',
+//    'technicalSEOtblReportMngr',
+//    'timeSheetAndAgendaMngr',
+ ];
+
+foreach ( $functions as $function ) {
+    $request->setFunction( $function );
+    $request->setParameters([$sheetId]);
+
+    try {
+        $result = $service->scripts->run( SCRIPT_ID, $request );
+    }catch ( \Exception $e ){
+        $logs[] = $e->getMessage();
+    }
 }
+
 
 print_r( $logs );
 //log_to_file( $logs );
