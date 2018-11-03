@@ -13,11 +13,12 @@ $client->setScopes([
     Google_Service_Sheets::SPREADSHEETS,
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/script.projects"
+    "https://www.googleapis.com/auth/script.projects",
+    "https://www.googleapis.com/auth/script.container.ui",
 ]);
 $client->setAuthConfig(CREDENTIALS_FILE);
 $client->setAccessType('offline');
-$client->setPrompt('select_account consent');
+$client->setPrompt('consent');
 
 // Load previously authorized token from a file, if it exists.
 if (file_exists(TOKEN)) {

@@ -68,16 +68,17 @@ $request = new Google_Service_Script_ExecutionRequest();
 
 
 $functions = [
+//    'test',
     'recreateInputSSMgr',
-//    'screamingFrogDataComparisongMgr',
-//    'onPageSEOReportMngr',
-//    'technicalSEOtblReportMngr',
-//    'timeSheetAndAgendaMngr',
+    'screamingFrogDataComparisongMgr',
+    'onPageSEOReportMngr',
+    'technicalSEOtblReportMngr',
+    'timeSheetAndAgendaMngr',
  ];
-
+$request->setDevMode(true);
+$request->setParameters([ $sheetId ]);
 foreach ( $functions as $function ) {
     $request->setFunction( $function );
-    $request->setParameters([$sheetId]);
 
     try {
         $result = $service->scripts->run( SCRIPT_ID, $request );
@@ -86,8 +87,9 @@ foreach ( $functions as $function ) {
     }
 }
 
-
-print_r( $logs );
+if( ! empty( $logs )){
+    print_r( $logs );
+}
 //log_to_file( $logs );
 
 /**
@@ -162,8 +164,9 @@ function getClient()
     $client->setScopes([
         Google_Service_Sheets::SPREADSHEETS,
         "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/drive.file" ,
-        "https://www.googleapis.com/auth/script.projects"
+        "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/script.projects",
+        "https://www.googleapis.com/auth/script.container.ui",
     ]);
     $client->setAuthConfig( CREDENTIALS_FILE );
     $client->setAccessType('offline');

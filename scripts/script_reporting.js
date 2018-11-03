@@ -1,10 +1,25 @@
-var reportSS_ID = "";
+var reportSS_ID = "1COChxDFCta_rzb1u3AVwLdjYQqVBVAtGrZu-_lBSutk";
+var testId = "1FMyvD0nfRMHq5YYRSX9TfzecuUaaIGM3Atress0ri48";
+/*
+recreateInputSSMgr()
+screamingFrogDataComparisongMgr()
+onPageSEOReportMngr()
+technicalSEOtblReportMngr()
+timeSheetAndAgendaMngr()
+*/
 
-function recreateInputSSMgr(scriptID) {
-    reportSS_ID = scriptID;
+function test(){
+    var testSS = SpreadsheetApp.openById( testId );
+    var sheet = testSS.getActiveSheet();
+    sheet.getRange(1, 1).setValue("STRING FROM API");
+}
+
+function recreateInputSSMgr( id ) {
+
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
-    var inputSSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
+//    var inputSSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
+    var inputSSID = id;
     // var inputSSID = "1tW9D_1KZKZtTJg3uaKjK9rJBXwqpJv9kU0MlMkuSe5Q";
     var initSheetNames = ["page_titles_all", "h1_all", "h2_all", "meta_description_all"];
 
@@ -20,7 +35,7 @@ function recreateInputSSMgr(scriptID) {
     for (i = 0; i < initSheetNames.length; i++) {
         var trr = sheetsNmsDict[initSheetNames[i]];
         for (j = 0; j < sheetsNmsDict[initSheetNames[i]].length; j++) {
-            var mySheet = inputSS.getSheetByName(initSheetNames[i])
+            var mySheet = inputSS.getSheetByName(initSheetNames[i]);
             var initArr = mySheet.getRange(3,1, mySheet.getLastRow(), mySheet.getLastColumn()).getValues();
             var newArr = inputDataArrProceed(initArr, sheetsNmsDict[initSheetNames[i]][j]);
             newSheetCreateDataInput(inputSS, sheetsNmsDict[initSheetNames[i]][j], newArr); //create new sheete and input data
@@ -171,18 +186,18 @@ function inputDataArrProceed (myArr, outputSheetName){
 
 
 
-function screamingFrogDataComparisongMgr(scriptID) {
+function screamingFrogDataComparisongMgr(id) {
 //!!!function to compare errors data (for each  category/specification under control from screaming frog with all links list /from screaming frog eaither/
 //!!!probably it would be run just 1 time for each website (on the beginning). and worrks with source data file goten by ID (SSID)
 //just one function proceedСomparison() to be called from this function
-    reportSS_ID = scriptID;
+
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
     var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
     // var SSID = "1dN7MtmIuY2khTtTRK4w4FFro1210v4kQ0XNePnBItVc";
-    var chekFlag = checkSourceSSConnection(SSID)
+    var chekFlag = checkSourceSSConnection(id)
 
-    var sourceSS = SpreadsheetApp.openById(SSID);
+    var sourceSS = SpreadsheetApp.openById(id);
 
     //var mySheet = outerS.getActiveSheet();
     var sheetAllIntrnlLinks = sourceSS.getSheetByName("internal_all");
@@ -204,9 +219,7 @@ function screamingFrogDataComparisongMgr(scriptID) {
     }
 }
 
-function onPageSEOReportMngr(scriptID){
-
-    reportSS_ID = scriptID;
+function onPageSEOReportMngr(id){
 
     var sheetName = "OnPageSEO_Below_500_words";
 
@@ -221,7 +234,7 @@ function onPageSEOReportMngr(scriptID){
 
     var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
     //var SSID = "1dN7MtmIuY2khTtTRK4w4FFro1210v4kQ0XNePnBItVc";
-    var sourceSS = SpreadsheetApp.openById(SSID);
+    var sourceSS = SpreadsheetApp.openById(id);
 
     var onPageSEORprtArr = [];
 
@@ -236,9 +249,7 @@ function onPageSEOReportMngr(scriptID){
     proceedSEOonPageArrToSS(onPageSEORprtArr, "ReportPages_Annex");
 }
 
-function technicalSEOtblReportMngr(scriptID){
-
-    reportSS_ID = scriptID;
+function technicalSEOtblReportMngr(id){
 
     // return;
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
@@ -252,7 +263,7 @@ function technicalSEOtblReportMngr(scriptID){
 
     //var SSID = "1dN7MtmIuY2khTtTRK4w4FFro1210v4kQ0XNePnBItVc";
     var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
-    var sourceSS = SpreadsheetApp.openById(SSID);
+    var sourceSS = SpreadsheetApp.openById(id);
 
     proceedSourceDoneMarks(sourceSS);
 
@@ -328,8 +339,7 @@ function technicalSEOtblReportMngr(scriptID){
 
 }
 
-function timeSheetAndAgendaMngr(scriptID){
-    reportSS_ID = scriptID;
+function timeSheetAndAgendaMngr(id){
     var timeSheetArr = [];
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
@@ -347,8 +357,8 @@ function timeSheetAndAgendaMngr(scriptID){
 
     // var SSID = "1dN7MtmIuY2khTtTRK4w4FFro1210v4kQ0XNePnBItVc";
     var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
-    var chekFlag = checkSourceSSConnection(SSID);
-    var sourceSS = SpreadsheetApp.openById(SSID);
+    var chekFlag = checkSourceSSConnection(id);
+    var sourceSS = SpreadsheetApp.openById(id);
 
     var errorsSheetNamesArr = ["page_titles_all", "page_titles_duplicate", "Pagina_titel_Below_30_characters",
         "Pagina_titel_Over_65_characters", "meta_description_all", "meta_description_duplicate", "Meta_beschrijving_Over_155_Characters", "Meta_beschrijving_Below_70_characters",
