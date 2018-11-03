@@ -1,5 +1,6 @@
 var reportSS_ID = "1COChxDFCta_rzb1u3AVwLdjYQqVBVAtGrZu-_lBSutk";
 var testId = "1FMyvD0nfRMHq5YYRSX9TfzecuUaaIGM3Atress0ri48";
+var inputSSID = '';
 /*
 recreateInputSSMgr()
 screamingFrogDataComparisongMgr()
@@ -8,10 +9,18 @@ technicalSEOtblReportMngr()
 timeSheetAndAgendaMngr()
 */
 
+function entryPoint( id ){
+  recreateInputSSMgr(id);
+  screamingFrogDataComparisongMgr(id);
+  onPageSEOReportMngr(id);
+  technicalSEOtblReportMngr(id);
+  timeSheetAndAgendaMngr(id);
+}
+
 function test(){
-    var testSS = SpreadsheetApp.openById( testId );
-    var sheet = testSS.getActiveSheet();
-    sheet.getRange(1, 1).setValue("STRING FROM API");
+  var testSS = SpreadsheetApp.openById( testId );
+  var sheet = testSS.getActiveSheet();
+  sheet.getRange(1, 1).setValue("STRING FROM API");
 }
 
 function recreateInputSSMgr( id ) {
@@ -19,7 +28,7 @@ function recreateInputSSMgr( id ) {
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
 //    var inputSSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
-    var inputSSID = id;
+  var inputSSID = id;
     // var inputSSID = "1tW9D_1KZKZtTJg3uaKjK9rJBXwqpJv9kU0MlMkuSe5Q";
     var initSheetNames = ["page_titles_all", "h1_all", "h2_all", "meta_description_all"];
 

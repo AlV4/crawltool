@@ -68,12 +68,7 @@ $request = new Google_Service_Script_ExecutionRequest();
 
 
 $functions = [
-//    'test',
-    'recreateInputSSMgr',
-    'screamingFrogDataComparisongMgr',
-    'onPageSEOReportMngr',
-    'technicalSEOtblReportMngr',
-    'timeSheetAndAgendaMngr',
+    'entryPoint',
  ];
 $request->setDevMode(true);
 $request->setParameters([ $sheetId ]);
