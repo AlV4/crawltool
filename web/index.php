@@ -68,7 +68,7 @@ $request = new Google_Service_Script_ExecutionRequest();
 
 
 $functions = [
-    'entryPoint',
+    SCRIPT_FUNCTION_NAME,
  ];
 $request->setDevMode(true);
 $request->setParameters([ $sheetId ]);

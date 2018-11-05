@@ -7,5 +7,5 @@ define( 'CONFIG_FOLDER', '/var/www/test.loc/config/');
 define( 'CREDENTIALS_FILE', '/var/www/test.loc/config/credentials.json');
 define( 'TOKEN', '/var/www/test.loc/config/token.json');
 define( 'SCRIPT_ID', '1FMyvD0nfRMHq5YYRSX9TfzecuUaaIGM3Atress0ri48');
-define( 'SCRIPT_ID', '1bKSj9eKjFipP0E8H0mO8gYQz6onVyQlx-l2OYb-jNmDrUu3Xwf0nCG7A');
-define( 'SCRIPT_FUNCTION_NAME', 'Entry point function name here');
+define( 'SCRIPT_ID', '1XszVRWlWocf73W6t2oD2CLnrHSxyOdMTu9gLKNOTk1mhQmHVNZXx8ipk');
+define( 'SCRIPT_FUNCTION_NAME', 'entryPoint');
