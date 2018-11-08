@@ -1,6 +1,10 @@
-var reportSS_ID = "1COChxDFCta_rzb1u3AVwLdjYQqVBVAtGrZu-_lBSutk";
-var testId = "1FMyvD0nfRMHq5YYRSX9TfzecuUaaIGM3Atress0ri48";
-var inputSSID = '';
+//var reportSS_ID = "1jjSlwcFRtgKyhnEWv4ziDSm9E0KSj8621Xy0qX091J0";
+//var testId = "1FMyvD0nfRMHq5YYRSX9TfzecuUaaIGM3Atress0ri48";
+
+//var reportSS_ID = "1EHhTqRZHpXXs0qE0topmGLHCKO0FLQw9crNexwG46jM"; //"1COChxDFCta_rzb1u3AVwLdjYQqVBVAtGrZu-_lBSutk";
+//var testId = "18Q_QCo72XaCOMys2kjlVk7teqVQCVwR6iYaqHUg1Sco"; //  "1FMyvD0nfRMHq5YYRSX9TfzecuUaaIGM3Atress0ri48";
+//var id = "1jQTNigWrP70L_YA1ytUyKhyWfF70rjD5NBlXr-Vuclw";
+//var inputSSID = '';
 /*
 recreateInputSSMgr()
 screamingFrogDataComparisongMgr()
@@ -8,27 +12,42 @@ onPageSEOReportMngr()
 technicalSEOtblReportMngr()
 timeSheetAndAgendaMngr()
 */
+var email = '4eralval@gmail.com';
 
-function entryPoint( id ){
+function entryPoint( id, reportId ){
   recreateInputSSMgr(id);
   screamingFrogDataComparisongMgr(id);
-  onPageSEOReportMngr(id);
-  technicalSEOtblReportMngr(id);
-  timeSheetAndAgendaMngr(id);
+ // onPageSEOReportMngr(id);
+  technicalSEOtblReportMngr(id, reportId);
+ // timeSheetAndAgendaMngr(id);
+
+  sendEmail( reportId );
 }
 
-function test(){
-  var testSS = SpreadsheetApp.openById( testId );
-  var sheet = testSS.getActiveSheet();
-  sheet.getRange(1, 1).setValue("STRING FROM API");
+function sendEmail( reportId ){
+  var file = DriveApp.getFileById(reportId);
+  MailApp.sendEmail( email, 'Script job done', 'Report attached.', {
+    name: 'Automatic SFrog Report',
+    attachments: [file.getAs(MimeType.PDF)]
+  });
 }
 
-function recreateInputSSMgr( id ) {
+function entryPointTest(){
+  var inputSSID = "18Q_QCo72XaCOMys2kjlVk7teqVQCVwR6iYaqHUg1Sco";
+  var reportSSID = "1jjSlwcFRtgKyhnEWv4ziDSm9E0KSj8621Xy0qX091J0";
+  recreateInputSSMgr(inputSSID);
+  screamingFrogDataComparisongMgr(inputSSID);
+ // onPageSEOReportMngr(id);
+  technicalSEOtblReportMngr(inputSSID, reportSSID);
+ // timeSheetAndAgendaMngr(id);
+}
 
-    var reportSs = SpreadsheetApp.openById(reportSS_ID);
+function recreateInputSSMgr(inputSSID) {
+
+    //var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
 //    var inputSSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
-  var inputSSID = id;
+  //var inputSSID = id;
     // var inputSSID = "1tW9D_1KZKZtTJg3uaKjK9rJBXwqpJv9kU0MlMkuSe5Q";
     var initSheetNames = ["page_titles_all", "h1_all", "h2_all", "meta_description_all"];
 
@@ -113,7 +132,12 @@ function updateTablesHdr(sheetObj) {
 
 function newSheetCreateDataInput(SS_Object, shName, dataRange) {
     var newSheet = SS_Object.insertSheet();
-    newSheet.setName(shName);
+    try {
+      newSheet.setName(shName);
+     } catch (err) {
+       return;
+     }
+
 
     //var f = dataRange.lenght;
     //var d1 = dataRange[0];
@@ -195,18 +219,19 @@ function inputDataArrProceed (myArr, outputSheetName){
 
 
 
-function screamingFrogDataComparisongMgr(id) {
+function screamingFrogDataComparisongMgr(inputSSID) {
 //!!!function to compare errors data (for each  category/specification under control from screaming frog with all links list /from screaming frog eaither/
 //!!!probably it would be run just 1 time for each website (on the beginning). and worrks with source data file goten by ID (SSID)
 //just one function proceedСomparison() to be called from this function
 
-    var reportSs = SpreadsheetApp.openById(reportSS_ID);
+   // id = "18Q_QCo72XaCOMys2kjlVk7teqVQCVwR6iYaqHUg1Sco";
+    //var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
-    var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
+    //var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
     // var SSID = "1dN7MtmIuY2khTtTRK4w4FFro1210v4kQ0XNePnBItVc";
-    var chekFlag = checkSourceSSConnection(id)
+    var chekFlag = checkSourceSSConnection(inputSSID)
 
-    var sourceSS = SpreadsheetApp.openById(id);
+    var sourceSS = SpreadsheetApp.openById(inputSSID);
 
     //var mySheet = outerS.getActiveSheet();
     var sheetAllIntrnlLinks = sourceSS.getSheetByName("internal_all");
@@ -258,8 +283,39 @@ function onPageSEOReportMngr(id){
     proceedSEOonPageArrToSS(onPageSEORprtArr, "ReportPages_Annex");
 }
 
-function technicalSEOtblReportMngr(id){
 
+function auxFunc(sheet) {
+
+    var myRangeVls = sheet.getRange(2, 1, sheet.getLastRow() -1, sheet.getLastColumn()).getValues();
+
+
+    var checkNum = -1;
+    var flag = false;
+    for each (member in myRangeVls[0]) {
+      checkNum++;
+      if (member.indexOf('Week') > -1) { //find where is week column
+          flag = true;
+          break;
+       }
+        //SpreadsheetApp.getUi().alert("f");
+    }
+
+    if (flag) {
+      var newArr = [[]];
+      for (var j = 1; j<myRangeVls.length; j++) { //put as week #1 for all links - just simulation to get whole situation (by Noel request)
+        newArr[j-1]= [1];
+        //myRangeVls[j][checkNum] = 1;
+      }
+     var recRange = sheet.getRange(3, checkNum + 1, newArr.length, newArr[0].length);
+     Logger.log(recRange.getA1Notation());
+     recRange.setValues(newArr);
+    }
+
+}
+
+function technicalSEOtblReportMngr(inputSSID, reportSS_ID){
+
+    // id = "1jQTNigWrP70L_YA1ytUyKhyWfF70rjD5NBlXr-Vuclw";
     // return;
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     // var reportSs = SpreadsheetApp.getActiveSpreadsheet();
@@ -272,7 +328,9 @@ function technicalSEOtblReportMngr(id){
 
     //var SSID = "1dN7MtmIuY2khTtTRK4w4FFro1210v4kQ0XNePnBItVc";
     var SSID = reportSs.getSheetByName("ReportPages").getRange("F1").getValues();
-    var sourceSS = SpreadsheetApp.openById(id);
+    var sourceSS = SpreadsheetApp.openById(inputSSID);
+
+    auxFunc(sourceSS.getSheetByName("page_titles_all"));//call aux function to push report mark on the first source sheet
 
     proceedSourceDoneMarks(sourceSS);
 
@@ -288,7 +346,7 @@ function technicalSEOtblReportMngr(id){
     var technSEOColoringArr = [];
 
     var timeEstimArr = [];
-    var timeRulesArr = getTimeRulesArr(); //load the table with timerules
+    var timeRulesArr = getTimeRulesArr(reportSS_ID); //load the table with timerules
 
     var pageSeqNum = 1;
     var flagCompleteTbl = true; //flag to show when we need complete table or when just by reporting period
@@ -298,7 +356,7 @@ function technicalSEOtblReportMngr(id){
         pageSeqNum++;
     }
 
-    proceedSEOTechnRprtArrToSS(technSEORprtArr, technSEOColoringArr, "ReportPages_Annex");
+    proceedSEOTechnRprtArrToSS(technSEORprtArr, technSEOColoringArr, "ReportPages_Annex", reportSS_ID);
 
 
     technSEOColoringArr = [];
@@ -316,7 +374,7 @@ function technicalSEOtblReportMngr(id){
     updateActualDataOfperiodtechnSEORprtArr(periodtechnSEORprtArr, technSEORprtArr, periodtimeEstimArr,timeEstimArr);
 
     for (var ej = 1; ej <= periodtimeEstimArr[0].length - 1; ej++){  //columns
-
+      // break;//05_11  break added to avoide weeks check, by Noel's request
         var tempTimeVal = 0;
         for (var xi = 0; xi < periodtimeEstimArr.length - 1; xi++) { //search for time value different from 0 for current column
             //var ff = periodtimeEstimArr[xi][ej];
@@ -340,11 +398,11 @@ function technicalSEOtblReportMngr(id){
 
     var timeEstimSumArr = updateTimeEstimateArrAndSum(periodtimeEstimArr);
 
-    proceedSEOTechnRprtArrToSS(periodtechnSEORprtArr, technSEOColoringArr, "ReportPages");
+    proceedSEOTechnRprtArrToSS(periodtechnSEORprtArr, technSEOColoringArr, "ReportPages", reportSS_ID);
 
-    estimationSumTimeTableToSS (timeEstimSumArr, "ReportPages", periodtechnSEORprtArr.length);
+    estimationSumTimeTableToSS (timeEstimSumArr, "ReportPages", periodtechnSEORprtArr.length, reportSS_ID);
 
-    testTimeTableToSS(periodtimeEstimArr, "ReportPages");
+    testTimeTableToSS(periodtimeEstimArr, "ReportPages", reportSS_ID);
 
 }
 
@@ -499,7 +557,7 @@ function specUpdateDataArr(arr) {
     return arr;
 }
 
-function getTimeRulesArr() {
+function getTimeRulesArr(reportSS_ID) {
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = reportSs.getSheetByName("TimeRules");
@@ -688,7 +746,7 @@ function updateActualDataOfperiodtechnSEORprtArr(periodtechnSEORprtArr, technSEO
     }
 }
 
-function estimationSumTimeTableToSS (timeEstimSumArr, reportSheetName, technSEORprtLength) {
+function estimationSumTimeTableToSS (timeEstimSumArr, reportSheetName, technSEORprtLength, reportSS_ID) {
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = reportSs.getSheetByName(reportSheetName);
@@ -766,7 +824,7 @@ function updateTimeEstimateArrAndSum(periodtimeEstimArr) {
     return timeEstimSumArr;
 }
 
-function testTimeTableToSS(periodtimeEstimArr, reportSheetName) {
+function testTimeTableToSS(periodtimeEstimArr, reportSheetName, reportSS_ID) {
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = reportSs.getSheetByName(reportSheetName);
@@ -775,7 +833,7 @@ function testTimeTableToSS(periodtimeEstimArr, reportSheetName) {
     myRange.setValues(periodtimeEstimArr);
 }
 
-function proceedSEOTechnRprtArrToSS(technSEORprtArr, technSEOColoringArr, reportSheetName){
+function proceedSEOTechnRprtArrToSS(technSEORprtArr, technSEOColoringArr, reportSheetName, reportSS_ID){
     var reportSs = SpreadsheetApp.openById(reportSS_ID);
     //var reportSs = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = reportSs.getSheetByName(reportSheetName);
@@ -817,7 +875,13 @@ function proceedSEOTechnRprtArrToSS(technSEORprtArr, technSEOColoringArr, report
 
     myRange.setValues(updArr);
     myRange.setBorder(true, true, true, true, true, true, "black", SpreadsheetApp.BorderStyle.SOLID);
-    myRange.setFontColors(technSEOColoringArr);
+    try {
+      myRange.setFontColors(technSEOColoringArr);
+    } catch (err) {
+      Logger.log(err);
+    }
+
+
 
     var myTechnSEOStyleRange = sheet.getRange(checkRow, 3, technSEORprtArr.length, maxArrLength -1);
     myTechnSEOStyleRange.setHorizontalAlignment("center");
@@ -865,8 +929,8 @@ function getTechnSEORprtArr( sourceSS, sheetName, technSEORprtArr, weeksRange, p
         //  if((controlArr[line_i][0].indexOf("ttp", 0) != -1) && (controlArr[line_i][weekPos]>=weeksRange[0] & controlArr[line_i][weekPos]<=(weeksRange[1]+2))) {
 
 
-        if((flagCompleteTbl && (controlArr[line_i][0].indexOf("ttp", 0) != -1) && (controlArr[line_i][ToRprtPos] == 1)) | ((flagCompleteTbl == false) && (controlArr[line_i][0].indexOf("ttp", 0) != -1) && (controlArr[line_i][weekPos]>=weeksRange[0] && controlArr[line_i][weekPos]<=weeksRange[1] ))) { //если это линк и его надо репортировать
-
+       // if((flagCompleteTbl && (controlArr[line_i][0].indexOf("ttp", 0) != -1) && (controlArr[line_i][ToRprtPos] == 1)) | ((flagCompleteTbl == false) && (controlArr[line_i][0].indexOf("ttp", 0) != -1) && (controlArr[line_i][weekPos]>=weeksRange[0] && controlArr[line_i][weekPos]<=weeksRange[1] ))) { //если это линк и его надо репортировать
+        if((flagCompleteTbl && (controlArr[line_i][0].indexOf("ttp", 0) != -1) && (controlArr[line_i][ToRprtPos] == 1)) | ((flagCompleteTbl == false) && (controlArr[line_i][0].indexOf("ttp", 0) != -1))) { //если это линк и его надо репортировать
             if(controlArr[line_i][0].indexOf("http://www.sywebs.nl/?team=mir-johnson", 0) != -1) {
                 var f = 0;
             }
@@ -942,7 +1006,11 @@ function getTechnSEORprtArr( sourceSS, sheetName, technSEORprtArr, weeksRange, p
             if (technSEORprtArr[tm_j][pageSeqNum] == "X"){  //time array filling
                 timeEstimArr[tm_j][pageSeqNum] = timeVal;
             } else {
-                timeEstimArr[tm_j][pageSeqNum] = 0;
+              try {
+                timeEstimArr[tm_j][pageSeqNum] = 0; }
+                catch (err) {
+                    Logger.log("err");
+                }
             }
         }
 
@@ -1411,15 +1479,17 @@ function proceedСomparison(sourceSS, sheetNameToCompare,  allLinksArr) {
         }
     }
 
+    try {
+     errorsSheet.insertRowsBefore(3, linksFreeFromErrorsArr.length);
+     var insertRange = errorsSheet.getRange(3, 1, linksFreeFromErrorsArr.length, linksFreeFromErrorsArr[0].length)
+     var check = insertRange.getA1Notation();
+     insertRange.setValues(linksFreeFromErrorsArr);
 
-    errorsSheet.insertRowsBefore(3, linksFreeFromErrorsArr.length);
-    var insertRange = errorsSheet.getRange(3, 1, linksFreeFromErrorsArr.length, linksFreeFromErrorsArr[0].length)
-    var check = insertRange.getA1Notation();
-    insertRange.setValues(linksFreeFromErrorsArr);
+     return linksFreeFromErrorsArr;
+    } catch (e) {
+      return linksFreeFromErrorsArr;
+    }
 
-    check = check;
-
-    return linksFreeFromErrorsArr;
 }
 
 

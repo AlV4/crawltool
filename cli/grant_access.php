@@ -15,6 +15,7 @@ $client->setScopes([
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/script.projects",
     "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/script.send_mail",
 ]);
 $client->setAuthConfig(CREDENTIALS_FILE);
 $client->setAccessType('offline');

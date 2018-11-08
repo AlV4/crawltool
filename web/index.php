@@ -62,16 +62,17 @@ $client = getClient();
 
 $sheetId = createSpreadSheet( $client, $folder, $resultFolder, $dataFormat );
 
+$reportTplId = createReport( $client, $folder );
+
 $service = new Google_Service_Script($client);
 
 $request = new Google_Service_Script_ExecutionRequest();
-
 
 $functions = [
     SCRIPT_FUNCTION_NAME,
  ];
 $request->setDevMode(true);
-$request->setParameters([ $sheetId ]);
+$request->setParameters([ $sheetId, $reportTplId ]);
 foreach ( $functions as $function ) {
     $request->setFunction( $function );
 
@@ -143,6 +144,15 @@ function createSpreadSheet( Google_Client $client, $name, $resultFolder,$dataFor
     return $fileSheet->getSpreadsheetId();
 }
 
+function createReport ( Google_Client $client, $folder )
+{
+    $driveService = new Google_Service_Drive( $client );
+    $fileTpl = new \Google_Service_Drive_DriveFile();
+    $fileTpl->setName( $folder."_".TEMPLATE_SHEET_NAME );
+    $copiedFile = $driveService->files->copy( TEMPLATE_SHEET_ID, $fileTpl );
+    return $copiedFile->getId();
+}
+
 /**
  * Returns an authorized API client.
  *
@@ -162,6 +172,7 @@ function getClient()
         "https://www.googleapis.com/auth/drive.file",
         "https://www.googleapis.com/auth/script.projects",
         "https://www.googleapis.com/auth/script.container.ui",
+        "https://www.googleapis.com/auth/script.send_mail",
     ]);
     $client->setAuthConfig( CREDENTIALS_FILE );
     $client->setAccessType('offline');
