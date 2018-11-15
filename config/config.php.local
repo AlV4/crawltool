@@ -1,0 +1,12 @@
+<?php
+
+// Set up your own paths and google files IDs
+
+define( 'RESULT_FOLDER', '/var/www/test.loc/seo_results');
+define( 'CONFIG_FOLDER', '/var/www/test.loc/config/');
+define( 'CREDENTIALS_FILE', '/var/www/test.loc/config/credentials.json');
+define( 'TOKEN', '/var/www/test.loc/config/token.json');
+define( 'SCRIPT_FUNCTION_NAME', 'entryPoint');
+define( 'SCRIPT_ID', '1fAAaQUOnyPNYynKpwDntQWfIHuX11yF4NOKkqzyL6n7nVQZPcuyPLo28');
+define( 'TEMPLATE_SHEET_ID', '18wesSD4T1dGJrXRkpnAtZkxSpghO0dfvSGn19S8CdEA');
+define( 'TEMPLATE_SHEET_NAME', 'SEO_tech_report_tool');
