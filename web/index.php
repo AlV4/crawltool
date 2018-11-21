@@ -30,7 +30,8 @@ $tabs = [
     "H2:All",
     "H2:Duplicate",
     "H2:Missing",
-    "Images:Missing Alt Text"
+    "Images:Missing Alt Text",
+    "Images:All",
 ];
 
 $allTabs = implode( ", ", $tabs );
