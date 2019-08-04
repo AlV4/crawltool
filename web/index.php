@@ -57,7 +57,7 @@ echo "Job started successfully, you will receive an email after process end.\n";
 
 $logs = [];
 
-//$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
+$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
 $client = getClient();
 
