@@ -35,7 +35,10 @@ $tabs = [
 ];
 
 $allTabs = implode( ", ", $tabs );
-
+$fileName = getFilenameFromTab( $tabs[1], $resultFolder, $dataFormat ) ;
+print_r ( $fileName );
+print_r ( array_map('str_getcsv', file($fileName) ) );
+exit;
 $conf = [
     "dockerRun" =>
         "docker run -v $resultFolder:/home/crawls screamingfrog --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
@@ -52,8 +55,8 @@ if ( empty( json_decode( shell_exec($conf['dockerCheckImageExists']) ) ) ){
 
 echo "Job started successfully, you will receive an email after process end.\n";
 
-//session_write_close();
-//fastcgi_finish_request();
+session_write_close();
+fastcgi_finish_request();
 
 $logs = [];
 
@@ -87,7 +90,15 @@ foreach ( $functions as $function ) {
 if( ! empty( $logs )){
     print_r( $logs );
 }
-//log_to_file( $logs );
+log_to_file( $logs );
+
+function getFilenameFromTab( $tabName, $folderName, $extension ){
+    return "$folderName/" . strtr( strtolower( $tabName ), [ ":" => "_", " " => "_" ] ) . ".$extension";
+}
+
+function getArrayFromCsv( $fileName ){
+    return [];
+}
 
 /**
  * @param Google_Client $client
