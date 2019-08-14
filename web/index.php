@@ -3,6 +3,12 @@
 require_once '../vendor/autoload.php';
 require_once '../config/config.php';
 
+$begin = microtime(true);
+
+define( 'IDX_TITLE', 0 );
+define( 'IDX_FIELDS', 1 );
+define( 'IDX_DATA_START', 2 );
+
 $link = $_REQUEST['link'];
 $logs = [];
 $printLogs = isset( $_REQUEST['logs'] );
@@ -36,9 +42,15 @@ $tabs = [
 ];
 
 $allTabs = implode( ", ", $tabs );
-$fileName = getFilenameFromTab( $tabs[1], $resultFolder, $dataFormat ) ;
-print_r ( $fileName );
-print_r ( array_map('str_getcsv', file($fileName) ) );
+$objects = createReport( $tabs, $resultFolder, $dataFormat );
+$timeSpent = microtime( true ) - $begin;
+print_r (
+    [
+    'first' => reset( $objects ),
+    'last' => end( $objects ),
+    'time' => $timeSpent
+    ]
+);
 exit;
 $conf = [
     "dockerRun" =>
@@ -68,127 +80,70 @@ if( $printLogs && ! empty( $logs ) ){
 }
 //log_to_file( $logs );
 
-function getFilenameFromTab( $tabName, $folderName, $extension ){
-    return "$folderName/" . strtr( strtolower( $tabName ), [ ":" => "_", " " => "_" ] ) . ".$extension";
-}
-
-function getArrayFromCsv( $fileName ){
-    return [];
+/**
+ * @param $tabs
+ * @param $resultFolder
+ * @param $dataFormat
+ * @return array
+ */
+function createReport( $tabs, $resultFolder, $dataFormat ){
+    $objects = [];
+    foreach ( $tabs as $tab ) {
+        $fileName = getFilenameFromTab( $tab, $resultFolder, $dataFormat ) ;
+        $arrFromFile = getArrayFromCsv( $fileName );
+        assembleLinksData( $objects, $arrFromFile );
+    }
+    return $objects;
 }
 
 /**
- * @param Google_Client $client
- * @param               $name
- * @param               $resultFolder
- * @param               $dataFormat
- *
+ * @param $objects
+ * @param $arrFromFile
+ */
+function assembleLinksData( &$objects, $arrFromFile ) {
+    $totalLines = count( $arrFromFile );
+    for ( $lineNumber = IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++ ) {
+
+        $link = $arrFromFile[ $lineNumber ][ 0 ];
+        $dataContainer = isset( $objects[ $link ] ) ? $objects[ $link ] : new class {};
+
+        foreach ( $arrFromFile[ IDX_FIELDS ] as $key => $field ) {
+            $field = str_low_underscore( $field );
+            $reportName = $arrFromFile[ IDX_TITLE ][ IDX_TITLE ];
+            $dataContainer->$reportName[ $field ] = $arrFromFile[ $lineNumber ][ $key ];
+        }
+
+        $objects[ $link ] = $dataContainer;
+    }
+}
+
+/**
+ * @param $tabName
+ * @param $folderName
+ * @param $extension
  * @return string
  */
-function createSpreadSheet( Google_Client $client, $name, $resultFolder,$dataFormat ){
-
-    $sheetService = new Google_Service_Sheets( $client );
-
-    $requestBody = new Google_Service_Sheets_Spreadsheet([
-        'properties' => [
-            'title' => $name
-        ]
-    ]);
-    $fileSheet = $sheetService->spreadsheets->create($requestBody);
-
-    $firstSheetId = $sheetService->spreadsheets->get($fileSheet->getSpreadsheetId())->getSheets()[0]->properties->sheetId;
-
-    $dirContent = array_values( array_diff( scandir( $resultFolder ), ['.','..','crawl.seospider'] ) );
-
-    $updateRequest = [];
-    foreach ( $dirContent as $tab ) { // add sheets with tab names according to export files
-        $updateRequest['requests'][] = [
-            'addSheet' => [
-                'properties'=>[ 'title'=> substr( $tab, 0, strpos($tab, '.') )  ]
-            ]
-        ];
-    }
-    $updateRequest['requests'][] = [ 'deleteSheet' => [ 'sheetId' => $firstSheetId ] ]; // delete first unnecessary sheet, if needed
-    try {
-        $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest($updateRequest);
-        $result = $sheetService->spreadsheets->batchUpdate($fileSheet->getSpreadsheetId(),$body);
-    } catch(Exception $ignore) {}
-    $sheets = $sheetService->spreadsheets->get($fileSheet->getSpreadsheetId())->getSheets();
-
-    $insertRequest = [];
-    foreach ( $sheets as $sheet ) {
-        $id = $sheet->getProperties()['sheetId'];
-        $tabName = $sheet->getProperties()['title'];
-        $insertRequest['requests'][] = [ 'pasteData' => [
-            'coordinate' => [ "sheetId" => $id,  "rowIndex" => 0,  "columnIndex" => 0 ],
-            "data" => file_get_contents("$resultFolder/$tabName.$dataFormat" ),
-            "delimiter" => ","
-        ] ];
-    }
-    try {
-        $body = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest($insertRequest);
-        $result = $sheetService->spreadsheets->batchUpdate($fileSheet->getSpreadsheetId(),$body);
-    } catch(Exception $ignore) {}
-
-    return $fileSheet->getSpreadsheetId();
-}
-
-function createReport ( Google_Client $client, $folder )
-{
-    $driveService = new Google_Service_Drive( $client );
-    $fileTpl = new \Google_Service_Drive_DriveFile();
-    $fileTpl->setName( $folder."_".TEMPLATE_SHEET_NAME );
-    $copiedFile = $driveService->files->copy( TEMPLATE_SHEET_ID, $fileTpl );
-    return $copiedFile->getId();
+function getFilenameFromTab( $tabName, $folderName, $extension ){
+    return "$folderName/" . str_low_underscore( $tabName ) . ".$extension";
 }
 
 /**
- * Returns an authorized API client.
- *
- * @return Google_Client the authorized client object
- * @throws Exception
- * @throws Google_Exception
- * @throws InvalidArgumentException
- * @throws LogicException
+ * @param $string
+ * @return string
  */
-function getClient()
-{
-    $client = new Google_Client();
-    $client->setApplicationName('ScreamingFrog');
-    $client->setScopes([
-        Google_Service_Sheets::SPREADSHEETS,
-        "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/drive.file",
-        "https://www.googleapis.com/auth/script.projects",
-        "https://www.googleapis.com/auth/script.container.ui",
-        "https://www.googleapis.com/auth/script.send_mail",
-    ]);
-    $client->setAuthConfig( CREDENTIALS_FILE );
-    $client->setAccessType('offline');
+function str_low_underscore( $string ) {
+    return strtr( strtolower( trim ( $string ) ), [ ":" => "_", " " => "_", "-" => '' ] );
+}
 
-    // Load previously authorized token from a file, if it exists.
-    $tokenPath = TOKEN;
-    if (file_exists($tokenPath)) {
-        $accessToken = json_decode(file_get_contents($tokenPath), true);
-        $client->setAccessToken($accessToken);
+/**
+ * @param $fileName
+ * @return array
+ */
+function getArrayFromCsv( $fileName ){
+    if( ! file_exists( $fileName ) ) {
+        return [ "ERROR" => "File not found: [ $fileName ]" ];
     }
-
-    // If there is no previous token or it's expired.
-    if ($client->isAccessTokenExpired()) {
-        // Refresh the token if possible, else fetch a new one.
-        if ($client->getRefreshToken()) {
-            $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-        } else {
-            echo "You need to run 'grant_acces.php' file using php cli interface! No access to Google Spreadsheets!!";
-            throw new ErrorException();
-        }
-        // Save the token to a file.
-        if (!file_exists(dirname($tokenPath))) {
-            mkdir(dirname($tokenPath), 0700, true);
-        }
-        file_put_contents($tokenPath, json_encode($client->getAccessToken()));
-    }
-
-    return $client;
+    return array_map('str_getcsv', file($fileName) );
 }
 
 /**
