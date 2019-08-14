@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <style>
-    input, select {
+    input {
         width: 100%;
         padding: 12px 20px;
         margin: 8px 0;
@@ -12,7 +12,7 @@
     }
 
     input[type=submit] {
-        width: 10%;
+        width: auto;
         min-width: 100px;
         background-color: #4CAF50;
         color: white;
@@ -23,11 +23,15 @@
         cursor: pointer;
     }
 
+    input[type=checkbox] {
+        width: auto;
+    }
+
     input[type=submit]:hover {
         background-color: #45a049;
     }
 
-    div {
+    .container {
         border-radius: 5px;
         background-color: #f2f2f2;
         padding: 20px;
@@ -40,9 +44,12 @@
 <div class="container">
     <form id="settings_form">
         <label for="input_link">Site address</label>
-        <input type="url" id="input_link" name="link" placeholder="Link" required>
-
-        <input type="submit" id="submit_btn" value="Run">
+        <input  id="input_link" name="link" placeholder="Link" required>
+        <input type="checkbox" id="logs" name="logs">
+        <label for="logs">Show output</label></br>
+        <div>
+            <input type="submit" id="submit_btn" value="Run">
+        </div>
     </form>
 </div>
 

@@ -4,10 +4,11 @@ require_once '../vendor/autoload.php';
 require_once '../config/config.php';
 
 $link = $_REQUEST['link'];
-
+$logs = [];
+$printLogs = isset( $_REQUEST['logs'] );
 if ( ! filter_var($link, FILTER_VALIDATE_URL) ){
-    echo "Invalid url!";;
-    throw new ErrorException();
+    echo "Invalid url!";
+    exit( 1 );
 }
 
 $folder = strtr( $link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__'] );
@@ -50,47 +51,22 @@ $conf = [
 
 if ( empty( json_decode( shell_exec($conf['dockerCheckImageExists']) ) ) ){
     echo $conf['dockerBuildMsg'];
-    throw new ErrorException();
+    exit( 1 );
 }
 
 echo "Job started successfully, you will receive an email after process end.\n";
 
-session_write_close();
-fastcgi_finish_request();
+//session_write_close();
+//fastcgi_finish_request();
 
-$logs = [];
 
-$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
-$client = getClient();
+//$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
-$sheetId = createSpreadSheet( $client, $folder, $resultFolder, $dataFormat );
-
-$reportTplId = createReport( $client, $folder );
-
-$service = new Google_Service_Script($client);
-
-$request = new Google_Service_Script_ExecutionRequest();
-
-$functions = [
-    SCRIPT_FUNCTION_NAME,
- ];
-$request->setDevMode(true);
-$request->setParameters([ $sheetId, $reportTplId ]);
-foreach ( $functions as $function ) {
-    $request->setFunction( $function );
-
-    try {
-        $result = $service->scripts->run( SCRIPT_ID, $request );
-    }catch ( \Exception $e ){
-        $logs[] = $e->getMessage();
-    }
-}
-
-if( ! empty( $logs )){
+if( $printLogs && ! empty( $logs ) ){
     print_r( $logs );
 }
-log_to_file( $logs );
+//log_to_file( $logs );
 
 function getFilenameFromTab( $tabName, $folderName, $extension ){
     return "$folderName/" . strtr( strtolower( $tabName ), [ ":" => "_", " " => "_" ] ) . ".$extension";
