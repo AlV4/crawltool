@@ -30,13 +30,55 @@ $tabs = [
     "H2:All",
     "H2:Duplicate",
     "H2:Missing",
-    "Images:Missing Alt Text",
     "Images:All",
+    "Images:Missing Alt Text",
 ];
 
+$tabsTree = [];
+foreach ($tabs as $tab) {
+    $tabsClassSubclass = explode(":", $tab);
+    $tabsTree[$tabsClassSubclass[0]][] = $tabsClassSubclass[1];
+}
+print_r($tabsTree);exit;
 $allTabs = implode( ", ", $tabs );
 $fileName = getFilenameFromTab( $tabs[1], $resultFolder, $dataFormat ) ;
-print_r ( $fileName );
+print_r ( $fileName . PHP_EOL );
+$writer = new XLSXWriter();
+$header = array(
+    'c1-text'=>'string',//text
+    'c2-text'=>'@',//text
+    'c3-integer'=>'integer',
+    'c4-integer'=>'0',
+    'c5-price'=>'price',
+    'c6-price'=>'#,##0.00',//custom
+    'c7-date'=>'date',
+    'c8-date'=>'YYYY-MM-DD',
+);
+//$rows = array(
+//    array('x101',102,103,104,105,106,'2018-01-07','2018-01-08'),
+//    array('x201',202,203,204,205,206,'2018-02-07','2018-02-08'),
+//    array('x301',302,303,304,305,306,'2018-03-07','2018-03-08'),
+//    array('x401',402,403,404,405,406,'2018-04-07','2018-04-08'),
+//    array('x501',502,503,504,505,506,'2018-05-07','2018-05-08'),
+//    array('x601',602,603,604,605,606,'2018-06-07','2018-06-08'),
+//    array('x701',702,703,704,705,706,'2018-07-07','2018-07-08'),
+//);
+$writer->setAuthor('Some Author');
+$sheetName = "Another sheet";
+$writer->writeSheetHeader($sheetName,$header);
+try {
+//    $writer->writeSheet( $tabs, 'sheet1', $header);
+//    foreach ($tabs as $row) {
+        $writer->writeSheetRow($sheetName, $tabs);
+//    }
+    $result = $writer->writeToString();
+    $writer->writeToFile( "../tmp/ex2.xls" );
+//    file_put_contents( "../tmp/ex.xls",$result);
+}catch (Exception $e){
+    print_r($e->getMessage());
+}
+//print_r($writer);
+print_r($result);
 print_r ( array_map('str_getcsv', file($fileName) ) );
 exit;
 $conf = [

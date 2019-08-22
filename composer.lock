@@ -4,53 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "09967929d1db6976321e22fb8a3864c8",
+    "hash": "34da46fc83b9b06a21f9584739040485",
+    "content-hash": "f926d3f877b5c421bb6c5e4f9ef6887f",
     "packages": [
-        {
-            "name": "asimlqt/php-google-spreadsheet-client",
-            "version": "v3.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/asimlqt/php-google-spreadsheet-client.git",
-                "reference": "fb82cdc12e6cef559a8f1e42dc26e0905f565055"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/asimlqt/php-google-spreadsheet-client/zipball/fb82cdc12e6cef559a8f1e42dc26e0905f565055",
-                "reference": "fb82cdc12e6cef559a8f1e42dc26e0905f565055",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.6.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.4.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Google\\": "src/Google"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Asim Liaquat",
-                    "email": "asimlqt22@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Google Spreadsheet PHP Client",
-            "homepage": "https://github.com/asimlqt/php-google-spreadsheet-client",
-            "keywords": [
-                "google",
-                "spreadsheet"
-            ],
-            "time": "2016-11-09T07:43:08+00:00"
-        },
         {
             "name": "firebase/php-jwt",
             "version": "v5.0.0",
@@ -95,7 +51,7 @@
             ],
             "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
             "homepage": "https://github.com/firebase/php-jwt",
-            "time": "2017-06-27T22:17:23+00:00"
+            "time": "2017-06-27 22:17:23"
         },
         {
             "name": "google/apiclient",
@@ -154,7 +110,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2019-05-21T18:06:55+00:00"
+            "time": "2019-05-21 18:06:55"
         },
         {
             "name": "google/apiclient-services",
@@ -191,7 +147,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2019-06-23T00:23:39+00:00"
+            "time": "2019-06-23 00:23:39"
         },
         {
             "name": "google/auth",
@@ -242,7 +198,7 @@
                 "google",
                 "oauth2"
             ],
-            "time": "2019-04-16T18:48:28+00:00"
+            "time": "2019-04-16 18:48:28"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -307,7 +263,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2018-04-22T15:46:56+00:00"
+            "time": "2018-04-22 15:46:56"
         },
         {
             "name": "guzzlehttp/promises",
@@ -358,7 +314,7 @@
             "keywords": [
                 "promise"
             ],
-            "time": "2016-12-20T10:07:11+00:00"
+            "time": "2016-12-20 10:07:11"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -429,7 +385,49 @@
                 "uri",
                 "url"
             ],
-            "time": "2019-07-01T23:21:34+00:00"
+            "time": "2019-07-01 23:21:34"
+        },
+        {
+            "name": "mk-j/php_xlsxwriter",
+            "version": "0.37",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mk-j/PHP_XLSXWriter.git",
+                "reference": "c4ba6023fcd49578062e35ed6af3e205dd50a903"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mk-j/PHP_XLSXWriter/zipball/c4ba6023fcd49578062e35ed6af3e205dd50a903",
+                "reference": "c4ba6023fcd49578062e35ed6af3e205dd50a903",
+                "shasum": ""
+            },
+            "require": {
+                "ext-zip": "*",
+                "php": ">=5.2.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.3.*"
+            },
+            "type": "project",
+            "autoload": {
+                "classmap": [
+                    "xlsxwriter.class.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP Library to write XLSX files",
+            "homepage": "https://github.com/mk-j/PHP_XLSXWriter",
+            "keywords": [
+                "excel",
+                "library",
+                "php",
+                "xls",
+                "xlsx"
+            ],
+            "time": "2018-01-11 08:03:56"
         },
         {
             "name": "monolog/monolog",
@@ -507,7 +505,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2018-11-05T09:00:11+00:00"
+            "time": "2018-11-05 09:00:11"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -599,7 +597,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2019-06-23T16:33:11+00:00"
+            "time": "2019-06-23 16:33:11"
         },
         {
             "name": "psr/cache",
@@ -645,7 +643,7 @@
                 "psr",
                 "psr-6"
             ],
-            "time": "2016-08-06T20:24:11+00:00"
+            "time": "2016-08-06 20:24:11"
         },
         {
             "name": "psr/http-message",
@@ -695,7 +693,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06T14:39:51+00:00"
+            "time": "2016-08-06 14:39:51"
         },
         {
             "name": "psr/log",
@@ -742,7 +740,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20T15:27:04+00:00"
+            "time": "2018-11-20 15:27:04"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -782,7 +780,7 @@
                 }
             ],
             "description": "A polyfill for getallheaders.",
-            "time": "2019-03-08T08:55:37+00:00"
+            "time": "2019-03-08 08:55:37"
         }
     ],
     "packages-dev": [],
@@ -791,6 +789,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-json": "*"
+    },
     "platform-dev": []
 }
