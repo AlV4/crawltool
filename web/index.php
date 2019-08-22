@@ -6,21 +6,21 @@ require_once '../app/ReportItem.php';
 
 $begin = microtime(true);
 
-define( 'IDX_TITLE', 0 );
-define( 'IDX_FIELDS', 1 );
-define( 'IDX_DATA_START', 2 );
+define('IDX_TITLE', 0);
+define('IDX_FIELDS', 1);
+define('IDX_DATA_START', 2);
 
 $link = $_REQUEST['link'];
 $logs = [];
-$printLogs = isset( $_REQUEST['logs'] );
-if ( ! filter_var($link, FILTER_VALIDATE_URL) ){
+$printLogs = isset($_REQUEST['logs']);
+if (!filter_var($link, FILTER_VALIDATE_URL)) {
     echo "Invalid url!";
-    exit( 1 );
+    exit(1);
 }
 
-$folder = strtr( $link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__'] );
+$folder = strtr($link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__']);
 
-$resultFolder = RESULT_FOLDER.DIRECTORY_SEPARATOR.$folder;
+$resultFolder = RESULT_FOLDER . DIRECTORY_SEPARATOR . $folder;
 
 $dataFormat = 'csv';
 
@@ -42,30 +42,86 @@ $tabs = [
     "Images:Missing Alt Text",
 ];
 
-$tabsTree = buildTabTree( $tabs );
-$allTabs = implode( ", ", $tabs );
-$objects = createReport( $tabs, $resultFolder, $dataFormat );
-$timeSpent = microtime( true ) - $begin;
-print_r (
+$tabsTree = tabsToFields($tabs);
+//print_r($tabsTree);
+//exit;
+$allTabs = implode(", ", $tabs);
+$objects = createReport($tabs, $resultFolder, $dataFormat);
+$timeSpent = microtime(true) - $begin;
+print_r(
     [
-    'first' => reset( $objects ),
-    'last' => end( $objects ),
-    'time' => $timeSpent
+        'first' => reset($objects),
+        'last' => end($objects),
+        'time' => $timeSpent
     ]
 );
-$fileName = getFilenameFromTab( $tabs[1], $resultFolder, $dataFormat ) ;
-print_r ( $fileName . PHP_EOL );
-//$writer = new XLSXWriter();
-//$writer->setAuthor('Some Author');
-//$sheetName = "Another sheet";
-//$writer->writeSheetHeader($sheetName,$header);
-//$writer->writeSheetRow($sheetName, $tabs);
-//$result = $writer->writeToString();
-//$writer->writeToFile( "../tmp/ex2.xls" );
-////print_r($writer);
-//print_r($result);
+$fileName = getFilenameFromTab($tabs[1], $resultFolder, $dataFormat);
+print_r($fileName . PHP_EOL);
+//exit;
+$writer = new XLSXWriter();
+$writer->setAuthor('Screaming Frog Automatic Report Builder');
+$headers = [ 'Technical SEO Report' ] + $tabs;
+$widths = [ 80 ];
+$headerValues = [ '' => 'string' ];
+//print_r([$headers, $widths]);exit;
+$writer->writeSheetHeader( $folder, $headerValues, [ 'widths' => $widths, 'halign' =>'center' ] );
+$format = [
+    'font'=>'Arial',
+    'font-size'=>14,
+    'fill'=>'#eee',
+    'border'=>'top,bottom,left,right',
+    'valign' => 'center',
+    'height'=> 20,
+    'halign'=>'center',
+];
+$writer->markMergedCell($folder, $start_row=1, $start_col=1, $end_row=1, $end_col=3);
+$writer->markMergedCell($folder, $start_row=1, $start_col=4, $end_row=1, $end_col=6);
+$writer->markMergedCell($folder, $start_row=1, $start_col=7, $end_row=1, $end_col=9);
+$writer->markMergedCell($folder, $start_row=1, $start_col=10, $end_row=1, $end_col=12);
+$writer->markMergedCell($folder, $start_row=1, $start_col=13, $end_row=1, $end_col=14);
+$groupsMerged = ['Technical SEO Report'];
+$itemsOfGroups = ['URL'];
+$delimiter = ":";
+foreach ($tabs as $tab) {
+    $delimiterPos = strpos( $tab, $delimiter );
+    $groupsMerged[] = substr( $tab, 0, $delimiterPos );
+    $itemsOfGroups[] = substr( $tab, $delimiterPos + 1 );
+}
+unset( $groupsMerged[1] ); //get rid of internal tab
+unset( $itemsOfGroups[1] ); //get rid of internal tab
+$writer->writeSheetRow( $folder, $groupsMerged , $format );
+$format['font-size'] = 10;
+$writer->writeSheetRow( $folder, $itemsOfGroups , $format );
 
-print_r ( array_map('str_getcsv', file($fileName) ) );
+$format['font-size'] = 10;
+$format['height'] = 12;
+unset( $format['halign'] );
+
+foreach ($objects as $object) {
+    $answers = [ $object->getUrl() ];
+    $format[] = [ 'halign' => 'left' ];
+    foreach ($tabsTree as $tab) {
+        $cellFormat = [ 'halign' => 'center' ];
+        if ( $object->$tab ){
+//            $cellFormat['fill'] = '#333';
+            $answers[] = "v";
+        } else {
+//            $cellFormat['fill'] = '#aca';
+            $answers[] = "x";
+        }
+        $format[] = $cellFormat;
+    }
+    $writer->writeSheetRow( $folder, $answers , $format );
+}
+
+//$writer->writeSheetRow($sheetName, $tabs);
+$result = $writer->writeToString();
+$dir = "../tmp";
+$writer->writeToFile( "$dir/ex3.xls" );
+
+print_r($result);
+
+//print_r(array_map('str_getcsv', file($fileName)));
 exit;
 $conf = [
     "dockerRun" =>
@@ -76,9 +132,9 @@ $conf = [
         "docker inspect --type=image screamingfrog"
 ];
 
-if ( empty( json_decode( shell_exec($conf['dockerCheckImageExists']) ) ) ){
+if (empty(json_decode(shell_exec($conf['dockerCheckImageExists'])))) {
     echo $conf['dockerBuildMsg'];
-    exit( 1 );
+    exit(1);
 }
 
 echo "Job started successfully, you will receive an email after process end.\n";
@@ -87,11 +143,10 @@ echo "Job started successfully, you will receive an email after process end.\n";
 //fastcgi_finish_request();
 
 
-
 //$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
-if( $printLogs && ! empty( $logs ) ){
-    print_r( $logs );
+if ($printLogs && !empty($logs)) {
+    print_r($logs);
 }
 //log_to_file( $logs );
 
@@ -99,11 +154,14 @@ if( $printLogs && ! empty( $logs ) ){
  * @param array $tabs
  * @return array
  */
-function buildTabTree( array $tabs ){
+function tabsToFields(array $tabs)
+{
     $tabsTree = [];
     foreach ($tabs as $tab) {
-        $tabsClassSubclass = explode(":", $tab);
-        $tabsTree[$tabsClassSubclass[0]][] = $tabsClassSubclass[1];
+        if ( $tab === "Internal:All" ) { //don't need in report, contains all data
+            continue;
+        }
+        $tabsTree[] = str_low_underscore( $tab );
     }
     return $tabsTree;
 }
@@ -114,12 +172,13 @@ function buildTabTree( array $tabs ){
  * @param $dataFormat
  * @return array
  */
-function createReport( $tabs, $resultFolder, $dataFormat ){
+function createReport($tabs, $resultFolder, $dataFormat)
+{
     $objects = [];
-    foreach ( $tabs as $tab ) {
-        $fileName = getFilenameFromTab( $tab, $resultFolder, $dataFormat ) ;
-        $arrFromFile = getArrayFromCsv( $fileName );
-        assembleLinksData( $objects, $arrFromFile );
+    foreach ($tabs as $tab) {
+        $fileName = getFilenameFromTab($tab, $resultFolder, $dataFormat);
+        $arrFromFile = getArrayFromCsv($fileName);
+        assembleLinksData($objects, $arrFromFile);
     }
     return $objects;
 }
@@ -128,20 +187,24 @@ function createReport( $tabs, $resultFolder, $dataFormat ){
  * @param $objects
  * @param $arrFromFile
  */
-function assembleLinksData( &$objects, $arrFromFile ) {
-    $totalLines = count( $arrFromFile );
-    for ( $lineNumber = IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++ ) {
+function assembleLinksData(&$objects, $arrFromFile)
+{
+    $totalLines = count($arrFromFile);
+    for ($lineNumber = IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++) {
 
-        $link = $arrFromFile[ $lineNumber ][ 0 ];
-        $dataContainer = isset( $objects[ $link ] ) ? $objects[ $link ] : new ReportItem( $link );
+        $link = $arrFromFile[$lineNumber][0];
+        $dataContainer = isset($objects[$link]) ? $objects[$link] : new ReportItem($link);
 
-        foreach ( $arrFromFile[ IDX_FIELDS ] as $key => $field ) {
-            $field = str_low_underscore( $field );
-            $reportName = $arrFromFile[ IDX_TITLE ][ IDX_TITLE ];
-            $dataContainer->$reportName[ $field ] = $arrFromFile[ $lineNumber ][ $key ];
-        }
-
-        $objects[ $link ] = $dataContainer;
+        $classSubclass = explode( "-", $arrFromFile[IDX_TITLE][IDX_TITLE] );
+        $group = trim ( $classSubclass[0] );
+        $item = trim ( $classSubclass[1] );
+        $prop = str_low_underscore( "$group:$item" );
+        $dataContainer->$prop = true;
+        //TODO more complicated data, not sure is it needed
+//        foreach ($arrFromFile[IDX_FIELDS] as $key => $field) {
+//            $dataContainer->$group[$item][$field] = $arrFromFile[$lineNumber][$key];
+//        }
+        $objects[$link] = $dataContainer;
     }
 }
 
@@ -151,35 +214,38 @@ function assembleLinksData( &$objects, $arrFromFile ) {
  * @param $extension
  * @return string
  */
-function getFilenameFromTab( $tabName, $folderName, $extension ){
-    return "$folderName/" . str_low_underscore( $tabName ) . ".$extension";
+function getFilenameFromTab($tabName, $folderName, $extension)
+{
+    return "$folderName/" . str_low_underscore($tabName) . ".$extension";
 }
 
 /**
  * @param $string
  * @return string
  */
-function str_low_underscore( $string ) {
-    return strtr( strtolower( trim ( $string ) ), [ ":" => "_", " " => "_", "-" => '' ] );
+function str_low_underscore($string)
+{
+    return strtr(strtolower(trim($string)), [":" => "_", " " => "_", "-" => '']);
 }
 
 /**
  * @param $fileName
  * @return array
  */
-function getArrayFromCsv( $fileName ){
-    if( ! file_exists( $fileName ) ) {
-        return [ "ERROR" => "File not found: [ $fileName ]" ];
+function getArrayFromCsv($fileName)
+{
+    if (!file_exists($fileName)) {
+        return ["ERROR" => "File not found: [ $fileName ]"];
     }
-    return array_map('str_getcsv', file($fileName) );
+    return array_map('str_getcsv', file($fileName));
 }
 
 /**
  * @param $data
  */
-function log_to_file( $data )
+function log_to_file($data)
 {
-    if ( ! empty($data) ){
-        file_put_contents("log.txt", print_r($data , true), FILE_APPEND );
+    if (!empty($data)) {
+        file_put_contents("log.txt", print_r($data, true), FILE_APPEND);
     }
 }

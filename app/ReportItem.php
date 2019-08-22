@@ -25,5 +25,8 @@ class ReportItem
         $this->url = $url;
     }
 
-
+    public function __get($name)
+    {
+        return false;
+    }
 }
