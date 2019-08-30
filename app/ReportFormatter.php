@@ -38,6 +38,9 @@ class ReportFormatter
         $this->prepareHeaders( $tabs );
     }
 
+    /**
+     * @param array $tabs
+     */
     private function prepareHeaders( array $tabs )
     {
         $widths = $this->setColumnsWidths();
@@ -116,4 +119,11 @@ class ReportFormatter
         return $this->format;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getFolder ()
+    {
+        return $this->folder;
+    }
 }

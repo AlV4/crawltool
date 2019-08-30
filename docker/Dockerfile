@@ -21,7 +21,7 @@ RUN wget --no-verbose https://download.screamingfrog.co.uk/products/seo-spider/s
 COPY spider.config /root/.ScreamingFrogSEOSpider/spider.config
 COPY data /root/.ScreamingFrogSEOSpider/licence.txt
 
-RUN mkdir /home/crawls
+RUN mkdir /home/crawls && chown www-data:www-data /home/crawls && chmod 666 /home/crawls
 
 ENTRYPOINT ["/usr/bin/screamingfrogseospider"]
 
