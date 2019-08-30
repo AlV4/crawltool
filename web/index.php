@@ -3,6 +3,7 @@
 require_once '../vendor/autoload.php';
 require_once '../config/config.php';
 require_once '../app/ReportItem.php';
+require_once '../app/ReportFormatter.php';
 
 $begin = microtime(true);
 
@@ -58,60 +59,25 @@ print_r(
 $fileName = getFilenameFromTab($tabs[1], $resultFolder, $dataFormat);
 print_r($fileName . PHP_EOL);
 //exit;
-$writer = new XLSXWriter();
-$writer->setAuthor('Screaming Frog Automatic Report Builder');
-$headers = [ 'Technical SEO Report' ] + $tabs;
-$widths = [ 80 ];
-$headerValues = [ '' => 'string' ];
-//print_r([$headers, $widths]);exit;
-$writer->writeSheetHeader( $folder, $headerValues, [ 'widths' => $widths, 'halign' =>'center' ] );
-$format = [
-    'font'=>'Arial',
-    'font-size'=>14,
-    'fill'=>'#eee',
-    'border'=>'top,bottom,left,right',
-    'valign' => 'center',
-    'height'=> 20,
-    'halign'=>'center',
-];
-$writer->markMergedCell($folder, $start_row=1, $start_col=1, $end_row=1, $end_col=3);
-$writer->markMergedCell($folder, $start_row=1, $start_col=4, $end_row=1, $end_col=6);
-$writer->markMergedCell($folder, $start_row=1, $start_col=7, $end_row=1, $end_col=9);
-$writer->markMergedCell($folder, $start_row=1, $start_col=10, $end_row=1, $end_col=12);
-$writer->markMergedCell($folder, $start_row=1, $start_col=13, $end_row=1, $end_col=14);
-$groupsMerged = ['Technical SEO Report'];
-$itemsOfGroups = ['URL'];
-$delimiter = ":";
-foreach ($tabs as $tab) {
-    $delimiterPos = strpos( $tab, $delimiter );
-    $groupsMerged[] = substr( $tab, 0, $delimiterPos );
-    $itemsOfGroups[] = substr( $tab, $delimiterPos + 1 );
-}
-unset( $groupsMerged[1] ); //get rid of internal tab
-unset( $itemsOfGroups[1] ); //get rid of internal tab
-$writer->writeSheetRow( $folder, $groupsMerged , $format );
-$format['font-size'] = 10;
-$writer->writeSheetRow( $folder, $itemsOfGroups , $format );
-
-$format['font-size'] = 10;
-$format['height'] = 12;
-unset( $format['halign'] );
-
+$formatter = new ReportFormatter( new XLSXWriter(), $tabs, $folder );
+$format = $formatter->getFormat();
+$writer = $formatter->getWriter();
 foreach ($objects as $object) {
     $answers = [ $object->getUrl() ];
-    $format[] = [ 'halign' => 'left' ];
+    $format[] = [ 'halign' => 'left', 'color' => '#00f', 'border' => 'left,right,top,bottom' ];
     foreach ($tabsTree as $tab) {
-        $cellFormat = [ 'halign' => 'center' ];
+        $cellFormat = [ 'halign' => 'center', 'border' => 'left,right,top,bottom' ];
         if ( $object->$tab ){
-//            $cellFormat['fill'] = '#333';
+            $cellFormat['color'] = '#080';
             $answers[] = "v";
         } else {
-//            $cellFormat['fill'] = '#aca';
+            $cellFormat['color'] = '#000';
             $answers[] = "x";
         }
         $format[] = $cellFormat;
     }
     $writer->writeSheetRow( $folder, $answers , $format );
+    $format = [];
 }
 
 //$writer->writeSheetRow($sheetName, $tabs);
