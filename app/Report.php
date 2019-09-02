@@ -163,6 +163,18 @@ class Report
      */
     public function setTabs ( array $tabs )
     {
+        $res = [];
+        $group = explode( ":", $tabs[0] )[0];
+        foreach ( $tabs as $tab ) {
+            $nextGroup = explode( ":", $tab )[0];
+            if ( $group !== $nextGroup ){
+                $res [] = "$group:Over 70 Characters";
+                $group = $nextGroup;
+            }
+            $res [] = $tab;
+        }
+        print_r( $res );
+        exit;
         $this->tabs = $tabs;
     }
 }

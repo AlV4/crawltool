@@ -6,10 +6,6 @@ require_once '../app/Report.php';
 
 $begin = microtime(true);
 
-define('IDX_TITLE', 0);
-define('IDX_FIELDS', 1);
-define('IDX_DATA_START', 2);
-
 $link = $_REQUEST['link'];
 $logs = [];
 $printLogs = isset($_REQUEST['logs']);

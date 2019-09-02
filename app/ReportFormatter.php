@@ -41,7 +41,7 @@ class ReportFormatter
      */
     private function prepareHeaders( array $tabs )
     {
-        $widths = $this->setColumnsWidths( count( $tabs ) );
+        $widths = $this->setColumnsWidths( $tabs );
         $headerValues = [ '' => 'string' ];
         $this->writer->writeSheetHeader( $this->folder, $headerValues, [ 'widths' => $widths, 'halign' =>'center' ] );
         $format = [
@@ -83,12 +83,13 @@ class ReportFormatter
     }
 
     /**
-     * @param $columnsCount
+     * @param array $tabs
      * @return array
      */
-    private function setColumnsWidths ( $columnsCount )
+    private function setColumnsWidths ( $tabs )
     {
         $widths = [];
+        $columnsCount = count( $tabs );
         for( $i = 0; $i <= $columnsCount; $i++ ) {
             $widths[$i] = self::COLUMN_WIDTH;
         }
