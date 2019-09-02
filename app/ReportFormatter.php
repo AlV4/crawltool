@@ -10,8 +10,6 @@ class ReportFormatter
 
     const COLUMN_WIDTH = 10;
 
-    const COLUMNS_COUNT = 15;
-
     /**
      * @var XLSXWriter $writer
      */
@@ -43,7 +41,7 @@ class ReportFormatter
      */
     private function prepareHeaders( array $tabs )
     {
-        $widths = $this->setColumnsWidths();
+        $widths = $this->setColumnsWidths( count( $tabs ) );
         $headerValues = [ '' => 'string' ];
         $this->writer->writeSheetHeader( $this->folder, $headerValues, [ 'widths' => $widths, 'halign' =>'center' ] );
         $format = [
@@ -55,11 +53,16 @@ class ReportFormatter
             'height'=> 20,
             'halign'=>'center',
         ];
-        $this->writer->markMergedCell($this->folder, $start_row=1, $start_col=1, $end_row=1, $end_col=3);
-        $this->writer->markMergedCell($this->folder, $start_row=1, $start_col=4, $end_row=1, $end_col=6);
-        $this->writer->markMergedCell($this->folder, $start_row=1, $start_col=7, $end_row=1, $end_col=9);
-        $this->writer->markMergedCell($this->folder, $start_row=1, $start_col=10, $end_row=1, $end_col=12);
-        $this->writer->markMergedCell($this->folder, $start_row=1, $start_col=13, $end_row=1, $end_col=14);
+        $indexes = [];
+        foreach ( $tabs as $idx => $tab ) {
+            $groupItem = explode( ":", $tab );
+            $indexes[ $groupItem[0] ] = $idx + 1;
+        }
+        $start_col_idx = 1;
+        foreach ( $indexes as $index ) {
+            $this->writer->markMergedCell($this->folder, $start_row=1, $start_col=$start_col_idx, $end_row=1, $end_col=$index);
+            $start_col_idx = $index + 1;
+        }
         $groupsMerged = ['Technical SEO Report'];
         $itemsOfGroups = ['URL'];
         $delimiter = ":";
@@ -68,8 +71,6 @@ class ReportFormatter
             $groupsMerged[] = substr( $tab, 0, $delimiterPos );
             $itemsOfGroups[] = substr( $tab, $delimiterPos + 1 );
         }
-        unset( $groupsMerged[1] ); //get rid of internal tab
-        unset( $itemsOfGroups[1] ); //get rid of internal tab
         $this->writer->writeSheetRow( $this->folder, $groupsMerged , $format );
         $format['font-size'] = 10;
         $format['fill'] = '#ff7f50';
@@ -82,16 +83,16 @@ class ReportFormatter
     }
 
     /**
+     * @param $columnsCount
      * @return array
      */
-    private function setColumnsWidths ()
+    private function setColumnsWidths ( $columnsCount )
     {
         $widths = [];
-        for( $i = 0; $i < self::COLUMNS_COUNT; $i++ ) {
+        for( $i = 0; $i <= $columnsCount; $i++ ) {
             $widths[$i] = self::COLUMN_WIDTH;
         }
         $widths[0] = self::URL_COLUMN_WIDTH;
-        $widths[14] = 15;
         return $widths;
     }
 

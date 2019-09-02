@@ -33,8 +33,8 @@ class Report
      */
     public function __construct ( array $tabs, $folder, $resultFolder, $dataFormat )
     {
-        $this->reportFormatter = new ReportFormatter( new XLSXWriter(), $tabs, $folder );
-        $this->tabs = $tabs;
+        $this->setTabs( $tabs );
+        $this->reportFormatter = new ReportFormatter( new XLSXWriter(), $this->tabs, $folder );
         $this->resultFolder = $resultFolder;
         $this->dataFormat = $dataFormat;
         $this->buildReport();
@@ -74,9 +74,6 @@ class Report
     {
         $tabsTree = [];
         foreach ($tabs as $tab) {
-            if ( $tab === "Internal:All" ) { //don't need in report, contains all data
-                continue;
-            }
             $tabsTree[] = $this->str_low_underscore( $tab );
         }
         return $tabsTree;
@@ -159,5 +156,13 @@ class Report
     public function getReportString ()
     {
         return $this->reportString;
+    }
+
+    /**
+     * @param array $tabs
+     */
+    public function setTabs ( array $tabs )
+    {
+        $this->tabs = $tabs;
     }
 }

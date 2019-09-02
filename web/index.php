@@ -25,7 +25,7 @@ $resultFolder = RESULT_FOLDER . DIRECTORY_SEPARATOR . $folder;
 $dataFormat = 'csv';
 
 $tabs = [
-    "Internal:All",
+//    "Internal:All",
     "Page Titles:All",
     "Page Titles:Duplicate",
     "Page Titles:Missing",
@@ -38,8 +38,8 @@ $tabs = [
     "H2:All",
     "H2:Duplicate",
     "H2:Missing",
-    "Images:All",
-    "Images:Missing Alt Text",
+//    "Images:All",
+//    "Images:Missing Alt Text",
 ];
 
 $allTabs = implode(", ", $tabs);
@@ -63,7 +63,7 @@ echo "Job started successfully, you will receive an email after process end.\n";
 //session_write_close();
 //fastcgi_finish_request();
 
-$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
+//$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
 $report = new Report( $tabs, $folder, $resultFolder, $dataFormat );
 $timeSpent = microtime(true) - $begin;
