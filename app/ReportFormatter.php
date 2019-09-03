@@ -6,9 +6,13 @@ class ReportFormatter
 {
     public static $author = 'Screaming Frog Automatic Report Builder';
 
-    const URL_COLUMN_WIDTH = 80;
+    const URL_COLUMN_WIDTH = 70;
 
-    const COLUMN_WIDTH = 10;
+    const COLUMN_WIDTH = 9;
+
+    const COLUMN_EXTRA_WIDTH = 17;
+
+    private $extraWidthMultiplier = 4;
 
     /**
      * @var XLSXWriter $writer
@@ -91,9 +95,9 @@ class ReportFormatter
         $widths = [];
         $columnsCount = count( $tabs );
         for( $i = 0; $i <= $columnsCount; $i++ ) {
-            $widths[$i] = self::COLUMN_WIDTH;
+            $widths[ $i ] = $i % $this->extraWidthMultiplier === 0 ? self::COLUMN_EXTRA_WIDTH : self::COLUMN_WIDTH;
         }
-        $widths[0] = self::URL_COLUMN_WIDTH;
+        $widths[ 0 ] = self::URL_COLUMN_WIDTH;
         return $widths;
     }
 

@@ -50,7 +50,7 @@ class Report
             $format[] = [ 'halign' => 'left', 'color' => '#00f', 'border' => 'left,right,top,bottom' ];
             foreach ($tabsTree as $tab) {
                 $cellFormat = [ 'halign' => 'center', 'border' => 'left,right,top,bottom' ];
-                if ( $item->$tab ){
+                if ( ! empty( $item->$tab ) ){
                     $cellFormat['color'] = '#080';
                     $answers[] = "v";
                 } else {
@@ -87,8 +87,12 @@ class Report
         $reportItems = [];
         foreach ($this->tabs as $tab) {
             $fileName = $this->getFilenameFromTab($tab, $this->resultFolder, $this->dataFormat);
-            $arrFromFile = $this->getArrayFromCsv($fileName);
-            $this->assembleLinksData($reportItems, $arrFromFile);
+            $reportData = $this->getArrayFromCsv($fileName, $tab);
+            if ( is_string( $reportData ) ) {
+                $this->calculateParameter( $reportItems, $reportData, $tab );
+                continue;
+            }
+            $this->assembleLinksData($reportItems, $reportData);
         }
         return $reportItems;
     }
@@ -103,18 +107,27 @@ class Report
         for ($lineNumber = self::IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++) {
 
             $link = $arrFromFile[$lineNumber][0];
-            $dataContainer = isset($objects[$link]) ? $objects[$link] : new ReportItem($link);
+            $reportItem = isset($objects[$link]) ? $objects[$link] : new ReportItem($link);
 
             $classSubclass = explode( "-", $arrFromFile[self::IDX_TITLE][self::IDX_TITLE] );
             $group = trim ( $classSubclass[0] );
             $item = trim ( $classSubclass[1] );
             $prop = $this->str_low_underscore( "$group:$item" );
-            $dataContainer->$prop = true;
-            //TODO more complicated data, not sure is it needed
-//        foreach ($arrFromFile[IDX_FIELDS] as $key => $field) {
-//            $dataContainer->$group[$item][$field] = $arrFromFile[$lineNumber][$key];
-//        }
-            $objects[$link] = $dataContainer;
+            $reportItem->$prop = $arrFromFile[$lineNumber][self::IDX_FIELDS];
+            $reportItem->storeCsvLine( $arrFromFile[$lineNumber], $prop );
+            $objects[$link] = $reportItem;
+        }
+    }
+
+    /**
+     * @param $reportItems
+     * @param $paramName
+     * @param $tab
+     */
+    private function calculateParameter( &$reportItems, $paramName, $tab ) {
+        /** @var ReportItem $reportItem */
+        foreach ( $reportItems as $reportItem ) {
+            $reportItem->$paramName = $reportItem->calculate( $tab );
         }
     }
 
@@ -140,12 +153,13 @@ class Report
 
     /**
      * @param $fileName
-     * @return array
+     * @param $tab
+     * @return array|string
      */
-    private function getArrayFromCsv($fileName)
+    private function getArrayFromCsv($fileName, $tab)
     {
         if (!file_exists($fileName)) {
-            return ["ERROR" => "File not found: [ $fileName ]"];
+            return $this->str_low_underscore( $tab );
         }
         return array_map('str_getcsv', file($fileName));
     }
@@ -163,18 +177,20 @@ class Report
      */
     public function setTabs ( array $tabs )
     {
-        $res = [];
-        $group = explode( ":", $tabs[0] )[0];
+        $nestedTabsGroupAsKey = [];
+        $tabsUpdated = [];
         foreach ( $tabs as $tab ) {
-            $nextGroup = explode( ":", $tab )[0];
-            if ( $group !== $nextGroup ){
-                $res [] = "$group:Over 70 Characters";
-                $group = $nextGroup;
-            }
-            $res [] = $tab;
+            $group = explode(":", $tab)[0];
+            $nestedTabsGroupAsKey [ $group ][] = $tab;
         }
-        print_r( $res );
-        exit;
-        $this->tabs = $tabs;
+        foreach ( array_keys( $nestedTabsGroupAsKey ) as $group ) {
+            $nestedTabsGroupAsKey[ $group ][] = "$group:Over 70 Characters";
+        }
+        array_walk_recursive( $nestedTabsGroupAsKey, function( $item ) use ( &$tabsUpdated ){
+            if ( is_string( $item ) ) {
+                $tabsUpdated[] = $item;
+            }
+        } );
+        $this->tabs = $tabsUpdated;
     }
 }
