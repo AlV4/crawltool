@@ -12,8 +12,6 @@ class ReportFormatter
 
     const COLUMN_EXTRA_WIDTH = 17;
 
-    private $extraWidthMultiplier = 4;
-
     /**
      * @var XLSXWriter $writer
      */
@@ -92,12 +90,11 @@ class ReportFormatter
      */
     private function setColumnsWidths ( $tabs )
     {
-        $widths = [];
-        $columnsCount = count( $tabs );
-        for( $i = 0; $i <= $columnsCount; $i++ ) {
-            $widths[ $i ] = $i % $this->extraWidthMultiplier === 0 ? self::COLUMN_EXTRA_WIDTH : self::COLUMN_WIDTH;
+        $widths = [ self::URL_COLUMN_WIDTH ];
+        foreach ( $tabs as $tab ) {
+            $tabName = explode( ":", $tab )[ 1 ];
+            $widths[] = strlen( $tabName );
         }
-        $widths[ 0 ] = self::URL_COLUMN_WIDTH;
         return $widths;
     }
 

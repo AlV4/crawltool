@@ -33,7 +33,16 @@ class ReportItem
                 $count += $dataSet[ $index ];
             }
         }
-        return $count > $compareDigit ? 1 : 0;
+        $compareRule = $this->getCompareCondition( $tab );
+        switch ( $compareRule ) {
+            case "over":
+                return $count <= $compareDigit ? 1 : 0;
+                break;
+            case "below":
+                return $count >= $compareDigit ? 1 : 0;
+                break;
+        }
+        return 0;
     }
 
     /**
@@ -57,6 +66,21 @@ class ReportItem
     {
         preg_match_all('!\d+!', $tab, $matches);
         return end(end($matches) );
+    }
+
+    /**
+     * @param string $tab
+     * @return string
+     */
+    public function getCompareCondition( $tab )
+    {
+        if ( stripos( $tab, "over" ) !== false ) {
+            return "over";
+        }
+        if ( stripos( $tab, "below" ) !== false ){
+            return  "below";
+        }
+        return "";
     }
 
     /**

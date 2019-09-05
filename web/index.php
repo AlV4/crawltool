@@ -61,7 +61,7 @@ echo "Job started successfully, you will receive an email after process end.\n";
 
 //$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
-$report = new Report( $tabs, $folder, $resultFolder, $dataFormat );
+$report = new Report( $folder, $resultFolder, $dataFormat );
 $timeSpent = microtime(true) - $begin;
 $logs[] = "time spent: $timeSpent";
 

@@ -10,13 +10,34 @@ class Report
     const IDX_FIELDS = 1;
     const IDX_DATA_START = 2;
 
-    private $tabs;
+    private $tabs = [
+        "Page Titles:All",
+        "Page Titles:Duplicate",
+        "Page Titles:Missing",
+        "Page Titles:Below 30 Characters",
+        "Page Titles:Over 65 Characters",
+        "Meta Description:All",
+        "Meta Description:Duplicate",
+        "Meta Description:Missing",
+        "Meta Description:Over 155 Characters",
+        "Meta Description:Below 70 Characters",
+        "H1:All",
+        "H1:Duplicate",
+        "H1:Missing",
+        "H1:Over 70 Characters",
+        "H2:All",
+        "H2:Duplicate",
+        "H2:Missing",
+        "H2:Over 70 Characters",
+    ];
+
     private $resultFolder;
     private $dataFormat;
     /**
      * @var ReportFormatter $reportFormatter
      */
     private $reportFormatter;
+
     /**
      * @var string $reportString
      */
@@ -25,15 +46,12 @@ class Report
     private $outputDir = '../tmp';
 
     /**
-     * Report constructor.
-     * @param array $tabs
      * @param $folder
      * @param $resultFolder
      * @param $dataFormat
      */
-    public function __construct ( array $tabs, $folder, $resultFolder, $dataFormat )
+    public function __construct ( $folder, $resultFolder, $dataFormat )
     {
-        $this->setTabs( $tabs );
         $this->reportFormatter = new ReportFormatter( new XLSXWriter(), $this->tabs, $folder );
         $this->resultFolder = $resultFolder;
         $this->dataFormat = $dataFormat;
@@ -170,27 +188,5 @@ class Report
     public function getReportString ()
     {
         return $this->reportString;
-    }
-
-    /**
-     * @param array $tabs
-     */
-    public function setTabs ( array $tabs )
-    {
-        $nestedTabsGroupAsKey = [];
-        $tabsUpdated = [];
-        foreach ( $tabs as $tab ) {
-            $group = explode(":", $tab)[0];
-            $nestedTabsGroupAsKey [ $group ][] = $tab;
-        }
-        foreach ( array_keys( $nestedTabsGroupAsKey ) as $group ) {
-            $nestedTabsGroupAsKey[ $group ][] = "$group:Over 70 Characters";
-        }
-        array_walk_recursive( $nestedTabsGroupAsKey, function( $item ) use ( &$tabsUpdated ){
-            if ( is_string( $item ) ) {
-                $tabsUpdated[] = $item;
-            }
-        } );
-        $this->tabs = $tabsUpdated;
     }
 }
