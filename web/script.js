@@ -29,6 +29,18 @@ $(document).ready(function() {
         }
     } );
 
+    $('#clear_log').on( 'click', function ( e ) {
+        e.preventDefault();
+        resultConsole.html('');
+    } );
+
+    $('#status').on( 'click', function(){
+        $.get( "check_status.php" ).done( function( responce ){
+            log( responce, 50 );
+        } ).fail( function( error ){
+            log( error, 50 );
+        });
+    } );
     function log( data, scrollTime ){
         if (data) {
             resultConsole.html( '<pre>' + resultConsole.text() + "\n\n" + data + '</pre>' );
