@@ -13,3 +13,4 @@ config/*
 etc/*
 !config/credentials.json.dist
 !config/config.php.local
+!config/config.seospiderconfig

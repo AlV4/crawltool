@@ -19,6 +19,7 @@ RUN wget --no-verbose https://download.screamingfrog.co.uk/products/seo-spider/s
     apt-get install -f -y
 
 COPY spider.config /root/.ScreamingFrogSEOSpider/spider.config
+COPY config.seospiderconfig /root/.ScreamingFrogSEOSpider/config.seospiderconfig
 COPY data /root/.ScreamingFrogSEOSpider/licence.txt
 
 RUN mkdir /home/crawls && chown www-data:www-data /home/crawls && chmod 666 /home/crawls

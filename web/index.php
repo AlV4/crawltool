@@ -1,10 +1,11 @@
 <?php
 
+$begin = microtime(true);
+
 require_once '../vendor/autoload.php';
 require_once '../config/config.php';
 require_once '../app/Report.php';
 
-$begin = microtime(true);
 
 $link = $_REQUEST['link'];
 $logs = [];
@@ -42,7 +43,7 @@ $allTabs = implode(", ", $tabs);
 
 $conf = [
     "dockerRun" =>
-        "docker run -v $resultFolder:/home/crawls screamingfrog --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
+        "docker run -v $resultFolder:/home/crawls screamingfrog --config /root/.ScreamingFrogSEOSpider/config.seospiderconfig --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
     "dockerBuildMsg" =>
         "Need to build the docker image: 'docker build -t screamingfrog .'",
     "dockerCheckImageExists" =>
