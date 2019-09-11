@@ -43,11 +43,11 @@ $allTabs = implode(", ", $tabs);
 
 $conf = [
     "dockerRun" =>
-        "docker run -v $resultFolder:/home/crawls screamingfrog --config /root/.ScreamingFrogSEOSpider/config.seospiderconfig --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
+        "docker-compose run -v $resultFolder:/home/crawls screamingfrog --config /root/.ScreamingFrogSEOSpider/config.seospiderconfig --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
     "dockerBuildMsg" =>
-        "Need to build the docker image: 'docker build -t screamingfrog .'",
+        "Need to build the docker container: 'docker-compose up -d --build'",
     "dockerCheckImageExists" =>
-        "docker inspect --type=image screamingfrog"
+        "docker inspect screamingfrog"
 ];
 
 if (empty(json_decode(shell_exec($conf['dockerCheckImageExists'])))) {
@@ -60,7 +60,8 @@ echo "Job started successfully, you will receive an email after process end.\n";
 //session_write_close();
 //fastcgi_finish_request();
 
-//$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
+$logs['frog_output'] = shell_exec( $conf['dockerRun'] );
+//echo $conf['dockerRun'];
 
 $report = new Report( $folder, $resultFolder, $dataFormat );
 $timeSpent = microtime(true) - $begin;
