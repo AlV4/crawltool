@@ -43,7 +43,7 @@ $allTabs = implode(", ", $tabs);
 
 $conf = [
     "dockerRun" =>
-        "docker-compose run -v $resultFolder:/home/crawls screamingfrog --config /root/.ScreamingFrogSEOSpider/config.seospiderconfig --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
+        "docker run -v $resultFolder:/home/crawls alvcher/screamingfrog:1.0.0 --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
     "dockerBuildMsg" =>
         "Need to build the docker container: 'docker-compose up -d --build'",
     "dockerCheckImageExists" =>
@@ -61,7 +61,6 @@ echo "Job started successfully, you will receive an email after process end.\n";
 //fastcgi_finish_request();
 
 $logs['frog_output'] = shell_exec( $conf['dockerRun'] );
-//echo $conf['dockerRun'];
 
 $report = new Report( $folder, $resultFolder, $dataFormat );
 $timeSpent = microtime(true) - $begin;
