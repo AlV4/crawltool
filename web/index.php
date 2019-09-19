@@ -5,13 +5,19 @@ $begin = microtime(true);
 require_once '../vendor/autoload.php';
 require_once '../config/config.php';
 require_once '../app/Report.php';
+require_once 'send.php';
 
 
 $link = $_REQUEST['link'];
+$email = $_REQUEST['email'];
 $logs = [];
 $printLogs = isset($_REQUEST['logs']);
 if (!filter_var($link, FILTER_VALIDATE_URL)) {
     echo "Invalid url!";
+    exit(1);
+}
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "Invalid email!";
     exit(1);
 }
 
@@ -20,6 +26,8 @@ $folder = strtr($link, ['http://' => '', 'https://' => '', '.' => '_', '/' => ''
 $resultFolder = RESULT_FOLDER . DIRECTORY_SEPARATOR . $folder;
 
 $dataFormat = 'csv';
+
+$outputDataFormat = 'xls';
 
 $tabs = [
 //    "Internal:All",
@@ -62,9 +70,11 @@ echo "Job started successfully, you will receive an email after process end.\n";
 
 $logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
-$report = new Report( $folder, $resultFolder, $dataFormat );
+$report = new Report( $folder, $resultFolder, $dataFormat, $outputDataFormat );
 $timeSpent = microtime(true) - $begin;
-$logs[] = "time spent: $timeSpent";
+$logs['timing'] = "Time spent: $timeSpent";
+
+send( $email, $logs['timing'], $report->getResultFileName(), $report->getResultFilePath() );
 
 if ($printLogs && !empty($logs)) {
     print_r($logs);

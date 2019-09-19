@@ -33,6 +33,7 @@ class Report
 
     private $resultFolder;
     private $dataFormat;
+    private $outputDataFormat;
     /**
      * @var ReportFormatter $reportFormatter
      */
@@ -49,13 +50,31 @@ class Report
      * @param $folder
      * @param $resultFolder
      * @param $dataFormat
+     * @param $outputDataFormat
      */
-    public function __construct ( $folder, $resultFolder, $dataFormat )
+    public function __construct ( $folder, $resultFolder, $dataFormat, $outputDataFormat )
     {
         $this->reportFormatter = new ReportFormatter( new XLSXWriter(), $this->tabs, $folder );
         $this->resultFolder = $resultFolder;
         $this->dataFormat = $dataFormat;
+        $this->outputDataFormat = $outputDataFormat;
         $this->buildReport();
+    }
+
+    /**
+     * @return string
+     */
+    public function getResultFilePath ()
+    {
+        return $this->outputDir . DIRECTORY_SEPARATOR . $this->reportFormatter->getFolder() . "." . $this->outputDataFormat;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResultFileName ()
+    {
+        return $this->reportFormatter->getFolder() . "." . $this->outputDataFormat;
     }
 
     private function buildReport ()
@@ -81,7 +100,7 @@ class Report
             $format = [];
         }
         $this->reportString = $this->reportFormatter->getWriter()->writeToString();
-        $this->reportFormatter->getWriter()->writeToFile( $this->outputDir."/$folder.xls" );
+        $this->reportFormatter->getWriter()->writeToFile( $this->getResultFilePath() );
     }
 
     /**

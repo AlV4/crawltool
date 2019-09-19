@@ -3,6 +3,16 @@
 // Set up your own paths and google files IDs
 $rootFolder = "/home/alv4/prjcts/crawltool/";
 
+define( 'VERBOSE', true );
+
+define( 'MAIL_HOST', 'smtp.gmail.com' );
+define( 'MAIL_USERNAME', '' );
+define( 'MAIL_PASS', '' );
+define( 'MAIL_SMTP_SECURE', 'ssl' );
+define( 'MAIL_PORT', 465 );
+define( 'MAIL_SENDER_ADDRESS', '' );
+define( 'MAIL_SENDER_NAME', '' );
+
 define( 'RESULT_FOLDER', $rootFolder.'seo_results');
 define( 'CONFIG_FOLDER', $rootFolder.'config/');
 define( 'CREDENTIALS_FILE', $rootFolder.'config/credentials.json');
