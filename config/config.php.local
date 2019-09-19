@@ -14,10 +14,3 @@ define( 'MAIL_SENDER_ADDRESS', '' );
 define( 'MAIL_SENDER_NAME', '' );
 
 define( 'RESULT_FOLDER', $rootFolder.'seo_results');
-define( 'CONFIG_FOLDER', $rootFolder.'config/');
-define( 'CREDENTIALS_FILE', $rootFolder.'config/credentials.json');
-define( 'TOKEN', $rootFolder.'config/token.json');
-define( 'SCRIPT_FUNCTION_NAME', 'entryPoint');
-define( 'SCRIPT_ID', '1fAAaQUOnyPNYynKpwDntQWfIHuX11yF4NOKkqzyL6n7nVQZPcuyPLo28');
-define( 'TEMPLATE_SHEET_ID', '1VHNrtF0ypHDw4_9yApG8nIFZXO9q4ssaASZ1xrinDEk');
-define( 'TEMPLATE_SHEET_NAME', 'template_frog');
