@@ -13,6 +13,14 @@ class ReportItem
         "h2" => [ 3 ],
     ];
 
+    /**
+     * @var array of parameters, absent of which should return true in the report
+     */
+    private $invertedParameters = [
+        'duplicate',
+        'missing'
+    ];
+
     public function __construct( $url )
     {
         $this->setUrl( $url );
@@ -59,6 +67,21 @@ class ReportItem
     }
 
     /**
+     * @param $name
+     *
+     * @return bool
+     */
+    public function invertedField ( $name )
+    {
+        foreach ( $this->invertedParameters as $parameter ) {
+            if ( stripos( $name, $parameter ) !== false ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param string $tab
      * @return mixed
      */
@@ -97,10 +120,5 @@ class ReportItem
     public function setUrl($url)
     {
         $this->url = $url;
-    }
-
-    public function __get($name)
-    {
-        return false;
     }
 }

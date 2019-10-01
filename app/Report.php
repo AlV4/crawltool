@@ -46,6 +46,7 @@ class Report
 
     private $outputDir = '../tmp';
 
+    public $items = [];
     /**
      * @param $folder
      * @param $resultFolder
@@ -87,7 +88,7 @@ class Report
             $format[] = [ 'halign' => 'left', 'color' => '#00f', 'border' => 'left,right,top,bottom' ];
             foreach ($tabsTree as $tab) {
                 $cellFormat = [ 'halign' => 'center', 'border' => 'left,right,top,bottom' ];
-                if ( ! empty( $item->$tab ) ){
+                if ( ! empty( $item->$tab ) || $item->invertedField( $tab ) ){
                     $cellFormat['color'] = '#080';
                     $answers[] = "v";
                 } else {
