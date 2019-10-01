@@ -16,6 +16,7 @@ Run:
 Or submit to Google Build Triggers, which will host it for you privately at a URL like 
 `gcr.io/your-project/screamingfrog-docker:a2ffbd174483aaa27473ef6e0eee404f19058b1a` - for use in Kubernetes and such like. 
 
+
 ## Usage
 
 Once the image is built it can be reached via `docker run screamingfrog`.  By default it will show `--help`
