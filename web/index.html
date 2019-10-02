@@ -39,34 +39,47 @@
 </style>
 <body>
 
-<h3>Launch Screaming Frog Tool</h3>
+<div id="app">
 
-<div class="container">
-    <form id="settings_form">
-        <label for="input_link">Site address</label>
-        <input id="input_link" name="link" placeholder="Link" required>
-        <input placeholder="Email address" name="email" type="email" >
-        <select name="outputFormat" id="format" >
-            <option value="csv">CSV</option>
-            <option value="xls">XLS</option>
-        </select>
-        <label for="format">Output format</label>
-        </br>
-        <input type="checkbox" id="logs" name="logs">
-        <label for="logs">Show output</label>
-        </br>
+    <h3>{{ title }}</h3>
+
+    <div class="container">
+        <form id="settings_form">
+            <label for="input_link">Site address</label>
+            <input id="input_link" name="link" placeholder="Link" required>
+            <input placeholder="Email address" name="email" type="email" >
+            <select name="outputFormat" id="format" >
+                <option value="csv">CSV</option>
+                <option value="xls">XLS</option>
+            </select>
+            <label for="format">Output format</label>
+            </br>
+            <input type="checkbox" id="logs" name="logs">
+            <label for="logs">Show output</label>
+            </br>
+            <div>
+                <input type="submit" id="submit_btn" value="Run">
+            </div>
+        </form>
         <div>
-            <input type="submit" id="submit_btn" value="Run">
+            <button id="status">Check status</button>
+            <button id="monitoring">Monitoring</button>
+            <button type="submit" id="clear_log">Clear logs</button>
         </div>
-    </form>
-    <div>
-        <button id="status">Check status</button>
-        <button id="monitoring">Monitoring</button>
-        <button type="submit" id="clear_log">Clear logs</button>
     </div>
+
 </div>
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            title: 'Launch Screaming Frog Tool'
+        }
+    })
+</script>
 </html>
