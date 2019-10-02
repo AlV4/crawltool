@@ -1,6 +1,6 @@
 <?php
 
-$begin = microtime(true);
+$begin = microtime( true );
 
 require_once '../vendor/autoload.php';
 require_once '../config/config.php';
@@ -71,8 +71,9 @@ echo "Job started successfully, you will receive an email after process end.\n";
 $logs['frog_output'] = shell_exec( $conf['dockerRun'] );
 
 $report = new Report( $folder, $resultFolder, $dataFormat, $outputDataFormat );
-$timeSpent = microtime(true) - $begin;
-$logs['timing'] = "Time spent: $timeSpent";
+$timeSpent = microtime( true ) - $begin;
+$time =  gmdate("H:i:s", $timeSpent );
+$logs['timing'] = "Time spent: $time";
 
 send( $email, $logs['timing'], $report->getResultFileName(), $report->getResultFilePath( $outputDataFormat ) );
 
