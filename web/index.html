@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="En">
 <style>
     input {
         width: 100%;
@@ -46,6 +46,12 @@
         <label for="input_link">Site address</label>
         <input id="input_link" name="link" placeholder="Link" required>
         <input placeholder="Email address" name="email" type="email" >
+        <select name="outputFormat" id="format" >
+            <option value="csv">CSV</option>
+            <option value="xls">XLS</option>
+        </select>
+        <label for="format">Output format</label>
+        </br>
         <input type="checkbox" id="logs" name="logs">
         <label for="logs">Show output</label>
         </br>

@@ -7,7 +7,9 @@ require_once 'ReportItem.php';
 class Report
 {
     const IDX_TITLE = 0;
+
     const IDX_FIELDS = 1;
+
     const IDX_DATA_START = 2;
 
     private $tabs = [
@@ -32,8 +34,11 @@ class Report
     ];
 
     private $resultFolder;
+
     private $dataFormat;
+
     private $outputDataFormat;
+
     /**
      * @var ReportFormatter $reportFormatter
      */
@@ -47,6 +52,7 @@ class Report
     private $outputDir = '../tmp';
 
     public $items = [];
+
     /**
      * @param $folder
      * @param $resultFolder
@@ -63,11 +69,13 @@ class Report
     }
 
     /**
+     * @param $dataFormat
+     *
      * @return string
      */
-    public function getResultFilePath ()
+    public function getResultFilePath ( $dataFormat )
     {
-        return $this->outputDir . DIRECTORY_SEPARATOR . $this->reportFormatter->getFolder() . "." . $this->outputDataFormat;
+        return $this->outputDir . DIRECTORY_SEPARATOR . $this->reportFormatter->getFolder() . "." . $dataFormat;
     }
 
     /**
@@ -81,37 +89,45 @@ class Report
     private function buildReport ()
     {
         $reportItems = $this->createReport();
-        $tabsTree = $this->tabsToFields($this->tabs);
+        $tabsTree = $this->tabsToFields( $this->tabs );
         $folder = $this->reportFormatter->getFolder();
-        foreach ($reportItems as $item) {
+        $csv = [ array_merge( [ "URL" ], $this->tabs ) ];
+        foreach ( $reportItems as $item ) {
             $answers = [ $item->getUrl() ];
             $format[] = [ 'halign' => 'left', 'color' => '#00f', 'border' => 'left,right,top,bottom' ];
-            foreach ($tabsTree as $tab) {
+            foreach ( $tabsTree as $tab ) {
                 $cellFormat = [ 'halign' => 'center', 'border' => 'left,right,top,bottom' ];
-                if ( ! empty( $item->$tab ) || $item->invertedField( $tab ) ){
-                    $cellFormat['color'] = '#080';
+                if ( ! empty( $item->$tab ) || $item->invertedField( $tab ) ) {
+                    $cellFormat[ 'color' ] = '#080';
                     $answers[] = "v";
                 } else {
-                    $cellFormat['color'] = '#000';
+                    $cellFormat[ 'color' ] = '#000';
                     $answers[] = "x";
                 }
                 $format[] = $cellFormat;
             }
-            $this->reportFormatter->getWriter()->writeSheetRow( $folder, $answers , $format );
+            $this->reportFormatter->getWriter()->writeSheetRow( $folder, $answers, $format );
             $format = [];
+            $csv[] = $answers;
         }
         $this->reportString = $this->reportFormatter->getWriter()->writeToString();
-        $this->reportFormatter->getWriter()->writeToFile( $this->getResultFilePath() );
+        $this->reportFormatter->getWriter()->writeToFile( $this->getResultFilePath( 'xls' ) );
+        $csvReport = fopen( $this->getResultFilePath( 'csv' ), 'w' );
+        foreach ( $csv as $item ) {
+            fputcsv( $csvReport, $item );
+        }
+        fclose( $csvReport );
     }
 
     /**
      * @param array $tabs
+     *
      * @return array
      */
-    private function tabsToFields(array $tabs)
+    private function tabsToFields ( array $tabs )
     {
         $tabsTree = [];
-        foreach ($tabs as $tab) {
+        foreach ( $tabs as $tab ) {
             $tabsTree[] = $this->str_low_underscore( $tab );
         }
         return $tabsTree;
@@ -120,17 +136,17 @@ class Report
     /**
      * @return array
      */
-    private function createReport()
+    private function createReport ()
     {
         $reportItems = [];
-        foreach ($this->tabs as $tab) {
-            $fileName = $this->getFilenameFromTab($tab, $this->resultFolder, $this->dataFormat);
-            $reportData = $this->getArrayFromCsv($fileName, $tab);
+        foreach ( $this->tabs as $tab ) {
+            $fileName = $this->getFilenameFromTab( $tab, $this->resultFolder, $this->dataFormat );
+            $reportData = $this->getArrayFromCsv( $fileName, $tab );
             if ( is_string( $reportData ) ) {
                 $this->calculateParameter( $reportItems, $reportData, $tab );
                 continue;
             }
-            $this->assembleLinksData($reportItems, $reportData);
+            $this->assembleLinksData( $reportItems, $reportData );
         }
         return $reportItems;
     }
@@ -139,21 +155,21 @@ class Report
      * @param $objects
      * @param $arrFromFile
      */
-    private function assembleLinksData(&$objects, $arrFromFile)
+    private function assembleLinksData ( &$objects, $arrFromFile )
     {
-        $totalLines = count($arrFromFile);
-        for ($lineNumber = self::IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++) {
+        $totalLines = count( $arrFromFile );
+        for ( $lineNumber = self::IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++ ) {
 
-            $link = $arrFromFile[$lineNumber][0];
-            $reportItem = isset($objects[$link]) ? $objects[$link] : new ReportItem($link);
+            $link = $arrFromFile[ $lineNumber ][ 0 ];
+            $reportItem = isset( $objects[ $link ] ) ? $objects[ $link ] : new ReportItem( $link );
 
-            $classSubclass = explode( "-", $arrFromFile[self::IDX_TITLE][self::IDX_TITLE] );
-            $group = trim ( $classSubclass[0] );
-            $item = trim ( $classSubclass[1] );
+            $classSubclass = explode( "-", $arrFromFile[ self::IDX_TITLE ][ self::IDX_TITLE ] );
+            $group = trim( $classSubclass[ 0 ] );
+            $item = trim( $classSubclass[ 1 ] );
             $prop = $this->str_low_underscore( "$group:$item" );
-            $reportItem->$prop = $arrFromFile[$lineNumber][self::IDX_FIELDS];
-            $reportItem->storeCsvLine( $arrFromFile[$lineNumber], $prop );
-            $objects[$link] = $reportItem;
+            $reportItem->$prop = $arrFromFile[ $lineNumber ][ self::IDX_FIELDS ];
+            $reportItem->storeCsvLine( $arrFromFile[ $lineNumber ], $prop );
+            $objects[ $link ] = $reportItem;
         }
     }
 
@@ -162,7 +178,8 @@ class Report
      * @param $paramName
      * @param $tab
      */
-    private function calculateParameter( &$reportItems, $paramName, $tab ) {
+    private function calculateParameter ( &$reportItems, $paramName, $tab )
+    {
         /** @var ReportItem $reportItem */
         foreach ( $reportItems as $reportItem ) {
             $reportItem->$paramName = $reportItem->calculate( $tab );
@@ -173,33 +190,36 @@ class Report
      * @param $tabName
      * @param $folderName
      * @param $extension
+     *
      * @return string
      */
-    private function getFilenameFromTab($tabName, $folderName, $extension)
+    private function getFilenameFromTab ( $tabName, $folderName, $extension )
     {
-        return "$folderName/" . $this->str_low_underscore($tabName) . ".$extension";
+        return "$folderName/" . $this->str_low_underscore( $tabName ) . ".$extension";
     }
 
     /**
      * @param $string
+     *
      * @return string
      */
-    private function str_low_underscore($string)
+    private function str_low_underscore ( $string )
     {
-        return strtr(strtolower(trim($string)), [":" => "_", " " => "_", "-" => '']);
+        return strtr( strtolower( trim( $string ) ), [ ":" => "_", " " => "_", "-" => '' ] );
     }
 
     /**
      * @param $fileName
      * @param $tab
+     *
      * @return array|string
      */
-    private function getArrayFromCsv($fileName, $tab)
+    private function getArrayFromCsv ( $fileName, $tab )
     {
-        if (!file_exists($fileName)) {
+        if ( ! file_exists( $fileName ) ) {
             return $this->str_low_underscore( $tab );
         }
-        return array_map('str_getcsv', file($fileName));
+        return array_map( 'str_getcsv', file( $fileName ) );
     }
 
     /**

@@ -10,6 +10,7 @@ require_once 'send.php';
 
 $link = $_REQUEST['link'];
 $email = $_REQUEST['email'];
+$outputDataFormat = $_REQUEST['outputFormat'];
 $logs = [];
 $printLogs = isset($_REQUEST['logs']);
 if (!filter_var($link, FILTER_VALIDATE_URL)) {
@@ -20,14 +21,13 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo "Invalid email!";
     exit(1);
 }
+$outputDataFormat = in_array( $outputDataFormat, [ 'csv', 'xls' ] ) ? $outputDataFormat : 'csv';
 
 $folder = strtr($link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__']);
 
 $resultFolder = RESULT_FOLDER . DIRECTORY_SEPARATOR . $folder;
 
 $dataFormat = 'csv';
-
-$outputDataFormat = 'xls';
 
 $tabs = [
 //    "Internal:All",
@@ -74,7 +74,7 @@ $report = new Report( $folder, $resultFolder, $dataFormat, $outputDataFormat );
 $timeSpent = microtime(true) - $begin;
 $logs['timing'] = "Time spent: $timeSpent";
 
-send( $email, $logs['timing'], $report->getResultFileName(), $report->getResultFilePath() );
+send( $email, $logs['timing'], $report->getResultFileName(), $report->getResultFilePath( $outputDataFormat ) );
 
 if ($printLogs && !empty($logs)) {
     print_r($logs);
