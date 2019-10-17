@@ -1,0 +1,8 @@
+version: "3.6"
+
+services:
+  screamingfrog:
+    image: alvcher/screamingfrog:1.0.0
+    container_name: screamingfrog
+    volumes:
+      - ./seo_results:/home/crawls

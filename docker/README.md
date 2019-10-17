@@ -11,17 +11,18 @@ Here explained how to run docker commands without sudo permissions for different
 
 Run:
 
-`docker build -t screamingfrog .`
+`docker-compose up -d --build`
 
 Or submit to Google Build Triggers, which will host it for you privately at a URL like 
 `gcr.io/your-project/screamingfrog-docker:a2ffbd174483aaa27473ef6e0eee404f19058b1a` - for use in Kubernetes and such like. 
 
+
 ## Usage
 
-Once the image is built it can be reached via `docker run screamingfrog`.  By default it will show `--help`
+Once the image is built it can be reached via `docker run alvcher/screamingfrog:1.0.0`.  By default it will show `--help`
 
 ```
-> docker run screamingfrog
+> docker run alvcher/screamingfrog:1.0.0
 
 usage: ScreamingFrogSEOSpider [crawl-file|options]
 

@@ -1,0 +1,16 @@
+#IDE SETTINGS
+.idea
+
+#Vendor
+vendor/*
+
+#Results SeoFrog job
+seo_results/*.*
+!seo_results/.gitkeep
+
+#Config
+config/*
+etc/*
+!config/credentials.json.dist
+!config/config.php.local
+!config/config.seospiderconfig
