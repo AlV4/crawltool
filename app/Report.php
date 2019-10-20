@@ -49,7 +49,7 @@ class Report
      */
     private $reportString;
 
-    private $outputDir = '../tmp';
+    private $outputDir = '/var/www/html/crawler/reports';
 
     public $items = [];
 
