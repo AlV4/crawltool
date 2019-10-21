@@ -4,10 +4,6 @@ $(document).ready(function() {
 
     var formReady = true;
 
-    shell_monitoring = false;
-
-    $(".container").append($('<div id="result" style="max-height: 400px; overflow-wrap: break-word; overflow-x:hidden"></div>'));
-
     var resultConsole = $('#result');
 
     $('#settings_form').on( 'submit', function ( e ) {
@@ -31,38 +27,38 @@ $(document).ready(function() {
         }
     } );
 
-    $('#clear_log').on( 'click', function ( e ) {
-        e.preventDefault();
-        resultConsole.html('');
-    } );
+    // $('#clear_log').on( 'click', function ( e ) {
+    //     e.preventDefault();
+    //     resultConsole.data = '';
+    // } );
+    //
+    // $('#status').on( 'click', function(){
+    //     monitoring();
+    // } );
 
-    $('#status').on( 'click', function(){
-        monitoring();
-    } );
+    // $('#monitoring').on( 'click', function(){
+    //     if( shell_monitoring ) {
+    //         shell_monitoring = false;
+    //         $('#monitoring').html("Monitoring");
+    //     } else {
+    //         shell_monitoring = true;
+    //         $('#monitoring').html("Monitoring on");
+    //     }
+    // } );
 
-    $('#monitoring').on( 'click', function(){
-        if( shell_monitoring ) {
-            shell_monitoring = false;
-            $('#monitoring').html("Monitoring");
-        } else {
-            shell_monitoring = true;
-            $('#monitoring').html("Monitoring on");
-        }
-    } );
+    // window.setInterval(function() {
+    //     if(shell_monitoring) {
+    //        monitoring();
+    //     }
+    // }, 1000);
 
-    window.setInterval(function() {
-        if(shell_monitoring) {
-           monitoring();
-        }
-    }, 1000);
-
-    function monitoring() {
-        $.get( "check_status.php" ).done( function( responce ){
-            log( responce, 50 );
-        } ).fail( function( error ){
-            log( error, 50 );
-        });
-    }
+    // function monitoring() {
+    //     $.get( "check_status.php" ).done( function( response ){
+    //         log( response, 50 );
+    //     } ).fail( function( error ){
+    //         log( error, 50 );
+    //     });
+    // }
 
     function log( data, scrollTime ){
         if (data) {
