@@ -7,6 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <style>
+    pre {
+        max-height: 400px;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        overflow-x:hidden;
+        white-space: -moz-pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+    }
     input, select  {
         width: 80%;
         padding: 12px 20px;
@@ -70,10 +79,11 @@
                         </div>
                     </form>
                     <div>
-                        <v-btn id="status">Check status</v-btn>
-                        <v-btn id="monitoring">Monitoring</v-btn>
-                        <v-btn type="submit" id="clear_log">Clear logs</v-btn>
+                        <v-btn @click="status">Check status</v-btn>
+                        <v-btn @click="monitoring" >Monitoring</v-btn>
+                        <v-btn @click="clear_log">Clear logs</v-btn>
                     </div>
+                    <div id="result"><pre ref="result">{{ console }}</pre></div>
                 </div>
             </v-container>
         </v-content>
@@ -85,13 +95,43 @@
 <script src="script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script>
     new Vue({
         el: '#app',
         vuetify: new Vuetify(),
         data: () => ({
-            title: "Screaming Frog Launcher"
-        })
+            title: "Screaming Frog Launcher",
+            console: "",
+            monitioringRun: false
+        }),
+        methods : {
+            monitoring () {
+                this.monitoringRun = !this.monitoringRun;
+                const self = this;
+                if ( this.monitoringRun ) {
+                    self.interval = setInterval(function() {
+                        self.status();
+                    }, 1000);
+                } else {
+                    clearInterval( self.interval );
+                }
+            },
+            status () {
+                axios.get( 'check_status.php' ).then(
+                    response => {
+                        if ( response.data ) {
+                            this.console += response.data + "\n";
+                            var container = this.$refs.result;
+                            container.scrollTop = container.scrollHeight;
+                        }
+                    }
+                );
+            },
+            clear_log () {
+                this.console = "";
+            }
+        }
     })
 </script>
 </html>

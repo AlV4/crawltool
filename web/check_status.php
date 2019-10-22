@@ -7,10 +7,12 @@ if ( ! empty( $containersList ) && count( $containersList ) > 1 ){
     unset( $containersList[0] );
     $runningContainers = [];
     foreach ( $containersList as $item ) {
-        $runningContainers[] = runningContainerName( $item );
+        $runningContainers[ runningContainerName( $item ) ] = runningContainerImageName( $item );
     }
-    foreach ( $runningContainers as $runningContainer ) {
-        print_r( "[$runningContainer] : " . shell_exec( "docker logs --tail 1 $runningContainer" ) );
+    foreach ( $runningContainers as $runningContainer => $image ) {
+        if ( strpos( $image, "screamingfrog") !== false ) {
+            print_r( "[$runningContainer] : " . shell_exec( "docker logs --tail 1 $runningContainer" ) );
+        }
     }
 } else {
     echo "No Docker activity...";
@@ -25,4 +27,9 @@ function outputLineToArray ( $line )
 function runningContainerName( $line )
 {
     return end(outputLineToArray( $line ) );
+}
+
+function runningContainerImageName( $line )
+{
+    return ( ( array ) outputLineToArray( $line ) )[1];
 }
