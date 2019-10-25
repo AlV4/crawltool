@@ -117,9 +117,7 @@
 </div>
 
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <script>
@@ -139,8 +137,7 @@
 
             linkRules : [
                 v => !!v || 'Site address is required',
-                v => /^((https?):\/\/)?([w|W]{3}\.)+[a-zA-Z0-9\-\.]{3,}\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/.test(v) || 'Site address must be valid',
-                // v => /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/.test(v) || 'Site address must be valid',
+                v => /^(http|https):\/\/[^ "]+$/.test(v) || 'Site address must be valid',
             ],
 
             emailRules: [
@@ -153,12 +150,12 @@
         }),
         methods : {
             submit () {
-                console.log( this.form );
-                // axios.post( 'index.php' ).then(
-                //     response => {
-                //
-                //     }
-                // );
+                axios.post(`index.php`, this.form).then(
+                    res => {
+                        this.log( res.data );
+                    }
+                );
+                this.log( "Job started." );
             },
             validate () {
                 if (this.$refs.form.validate()) {
@@ -180,12 +177,15 @@
                 axios.get( 'check_status.php' ).then(
                     response => {
                         if ( response.data ) {
-                            this.console += response.data + "\n";
-                            var container = this.$refs.result;
-                            container.scrollTop = container.scrollHeight;
+                            this.log( response.data );
                         }
                     }
                 );
+            },
+            log( data ) {
+                this.console += data + "\n";
+                var container = this.$refs.result;
+                container.scrollTop = container.scrollHeight;
             },
             clear_log () {
                 this.console = "";

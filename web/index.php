@@ -7,12 +7,15 @@ require_once '../config/config.php';
 require_once '../app/Report.php';
 require_once 'send.php';
 
+$request = json_decode( file_get_contents("php://input") );
 
-$link = $_REQUEST['link'];
-$email = $_REQUEST['email'];
-$outputDataFormat = $_REQUEST['outputFormat'];
+$link = $request->link;
+$email = $request->email;
+$outputDataFormat = $request->outputFormat;
+$printLogs = $request->logs;
+$outputDataFormat = in_array( $outputDataFormat, [ 'csv', 'xls' ] ) ? $outputDataFormat : 'csv';
+
 $logs = [];
-$printLogs = isset($_REQUEST['logs']);
 if (!filter_var($link, FILTER_VALIDATE_URL)) {
     echo "Invalid url!";
     exit(1);
@@ -21,7 +24,6 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo "Invalid email!";
     exit(1);
 }
-$outputDataFormat = in_array( $outputDataFormat, [ 'csv', 'xls' ] ) ? $outputDataFormat : 'csv';
 
 $folder = strtr($link, ['http://' => '', 'https://' => '', '.' => '_', '/' => '', ':' => '__']);
 
@@ -62,8 +64,6 @@ if (empty(json_decode(shell_exec($conf['dockerCheckImageExists'])))) {
     echo $conf['dockerBuildMsg'];
     exit(1);
 }
-
-echo "Job started successfully, you will receive an email after process end.\n";
 
 //session_write_close();
 //fastcgi_finish_request();
