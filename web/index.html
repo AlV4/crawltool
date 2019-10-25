@@ -99,11 +99,15 @@
 
                     </v-form>
 
-                    <v-divider :inset="false"></v-divider>
+                    <v-col>
+                        <v-row justify="space-around">
 
-                    <v-btn @click="status">Check status</v-btn>
-                    <v-btn @click="monitoring" >Monitoring</v-btn>
-                    <v-btn @click="clear_log">Clear logs</v-btn>
+                            <v-btn @click="status">Check status</v-btn>
+                            <v-btn @click="monitoring" >Monitoring</v-btn>
+                            <v-btn @click="clear_log">Clear logs</v-btn>
+
+                        </v-row>
+                    </v-col>
 
                     <div id="result"><pre ref="result">{{ console }}</pre></div>
                 </div>
