@@ -21,7 +21,6 @@
         padding: 12px 20px;
         margin: 8px 0;
         display: inline-block;
-        border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box;
     }
@@ -58,31 +57,58 @@
     <v-app>
         <v-content>
             <v-container>
-                <h3>{{ title }}</h3>
+                <h3 class="display-1">{{ title }}</h3>
 
                 <div class="container">
-                    <form id="settings_form">
-                        <label for="input_link">Site address</label>
-                        <br>
-                        <input id="input_link" name="link" placeholder="Link" required>
-                        <input placeholder="Email address" name="email" type="email" required>
-                        <select name="outputFormat" id="format" >
-                            <option value="csv">CSV</option>
-                            <option value="xls">XLS</option>
-                        </select>
-                        <br>
-                        <input type="checkbox" id="logs" name="logs">
-                        <label for="logs">Show output</label>
-                        </br>
-                        <div>
-                            <input type="submit" id="submit_btn" value="Run">
-                        </div>
-                    </form>
-                    <div>
-                        <v-btn @click="status">Check status</v-btn>
-                        <v-btn @click="monitoring" >Monitoring</v-btn>
-                        <v-btn @click="clear_log">Clear logs</v-btn>
-                    </div>
+                    <v-form
+                        v-model="formValid"
+                        ref="form"
+                    >
+                        <v-text-field
+                            v-model="form.link"
+                            label="Site address"
+                            :rules="linkRules"
+                            required
+                        ></v-text-field>
+
+                        <v-text-field
+                            v-model="form.email"
+                            :rules="emailRules"
+                            label="E-mail"
+                            required
+                        ></v-text-field>
+
+                        <v-select
+                            v-model="form.outputFormat"
+                            :items="formats"
+                            :rules="[v => !!v || 'Format is required']"
+                            label="Report format"
+                            required
+                        ></v-select>
+
+                        <v-switch v-model="form.logs" class="ma-4" label="Show output"></v-switch>
+
+                        <v-btn
+                            :disabled="!formValid"
+                            color="success"
+                            class="mr-4"
+                            @click="validate"
+                        >
+                            Run
+                        </v-btn>
+
+                    </v-form>
+
+                    <v-col>
+                        <v-row justify="space-around">
+
+                            <v-btn @click="status">Check status</v-btn>
+                            <v-btn @click="monitoring" >Monitoring</v-btn>
+                            <v-btn @click="clear_log">Clear logs</v-btn>
+
+                        </v-row>
+                    </v-col>
+
                     <div id="result"><pre ref="result">{{ console }}</pre></div>
                 </div>
             </v-container>
@@ -102,10 +128,43 @@
         vuetify: new Vuetify(),
         data: () => ({
             title: "Screaming Frog Launcher",
+            form: {
+                link: "",
+                email: "",
+                outputFormat : "csv",
+                logs: false
+            },
+            formats: [ "csv", "xls" ],
+            formValid: false,
+
+            linkRules : [
+                v => !!v || 'Site address is required',
+                v => /^((https?):\/\/)?([w|W]{3}\.)+[a-zA-Z0-9\-\.]{3,}\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?$/.test(v) || 'Site address must be valid',
+                // v => /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/.test(v) || 'Site address must be valid',
+            ],
+
+            emailRules: [
+                v => !!v || 'E-mail is required',
+                v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+            ],
+
             console: "",
             monitioringRun: false
         }),
         methods : {
+            submit () {
+                console.log( this.form );
+                // axios.post( 'index.php' ).then(
+                //     response => {
+                //
+                //     }
+                // );
+            },
+            validate () {
+                if (this.$refs.form.validate()) {
+                    this.submit();
+                }
+            },
             monitoring () {
                 this.monitoringRun = !this.monitoringRun;
                 const self = this;
