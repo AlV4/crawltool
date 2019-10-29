@@ -1,6 +1,6 @@
 <?php
 
-// Set up your own paths and google files IDs
+// Set up your own paths and email settings
 $rootFolder = "/home/alv4/prjcts/crawltool/";
 
 define( 'MAIL_HOST', 'smtp.gmail.com' );
