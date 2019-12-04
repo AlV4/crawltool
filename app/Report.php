@@ -10,7 +10,7 @@ class Report
 
     const IDX_FIELDS = 1;
 
-    const IDX_DATA_START = 2;
+    const IDX_DATA_START = 1;
 
     private $tabs = [
         "Page Titles:All",
@@ -146,7 +146,7 @@ class Report
                 $this->calculateParameter( $reportItems, $reportData, $tab );
                 continue;
             }
-            $this->assembleLinksData( $reportItems, $reportData );
+            $this->assembleLinksData( $reportItems, $reportData, $tab );
         }
         return $reportItems;
     }
@@ -154,8 +154,9 @@ class Report
     /**
      * @param $objects
      * @param $arrFromFile
+     * @param $tab
      */
-    private function assembleLinksData ( &$objects, $arrFromFile )
+    private function assembleLinksData ( &$objects, $arrFromFile, $tab )
     {
         $totalLines = count( $arrFromFile );
         for ( $lineNumber = self::IDX_DATA_START; $lineNumber < $totalLines; $lineNumber++ ) {
@@ -163,10 +164,7 @@ class Report
             $link = $arrFromFile[ $lineNumber ][ 0 ];
             $reportItem = isset( $objects[ $link ] ) ? $objects[ $link ] : new ReportItem( $link );
 
-            $classSubclass = explode( "-", $arrFromFile[ self::IDX_TITLE ][ self::IDX_TITLE ] );
-            $group = trim( $classSubclass[ 0 ] );
-            $item = trim( $classSubclass[ 1 ] );
-            $prop = $this->str_low_underscore( "$group:$item" );
+            $prop = $this->str_low_underscore( $tab );
             $reportItem->$prop = $arrFromFile[ $lineNumber ][ self::IDX_FIELDS ];
             $reportItem->storeCsvLine( $arrFromFile[ $lineNumber ], $prop );
             $objects[ $link ] = $reportItem;

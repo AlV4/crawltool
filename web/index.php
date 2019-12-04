@@ -53,7 +53,7 @@ $allTabs = implode(", ", $tabs);
 
 $conf = [
     "dockerRun" =>
-        "docker run -v $resultFolder:/home/crawls alvcher/screamingfrog:1.0.0 --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
+        "docker run -v $resultFolder:/home/crawls alvcher/screamingfrog:1.1.1 --crawl $link --headless --overwrite --save-crawl --output-folder /home/crawls --export-format $dataFormat --export-tabs \"$allTabs\"",
     "dockerBuildMsg" =>
         "Need to build the docker container: 'docker-compose up -d --build'",
     "dockerCheckImageExists" =>
