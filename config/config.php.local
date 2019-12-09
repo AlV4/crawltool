@@ -12,3 +12,4 @@ define( 'MAIL_SENDER_ADDRESS', '' );
 define( 'MAIL_SENDER_NAME', '' );
 
 define( 'RESULT_FOLDER', $rootFolder.'seo_results');
+define( 'OUTPUT_FOLDER', '/var/www/html/crawler/reports');

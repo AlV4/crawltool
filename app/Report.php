@@ -49,8 +49,6 @@ class Report
      */
     private $reportString;
 
-    private $outputDir = '/var/www/html/crawler/reports';
-
     public $items = [];
 
     /**
@@ -75,7 +73,7 @@ class Report
      */
     public function getResultFilePath ( $dataFormat )
     {
-        return $this->outputDir . DIRECTORY_SEPARATOR . $this->reportFormatter->getFolder() . "." . $dataFormat;
+        return OUTPUT_FOLDER . DIRECTORY_SEPARATOR . $this->reportFormatter->getFolder() . "." . $dataFormat;
     }
 
     /**
