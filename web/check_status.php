@@ -18,17 +18,33 @@ if ( ! empty( $containersList ) && count( $containersList ) > 1 ){
     echo "No Docker activity...";
 }
 
+/**
+ * @param string $line
+ *
+ * @return array
+ */
 function outputLineToArray ( $line )
 {
     $delimiter = "^";
     return array_values( explode( $delimiter, preg_replace( '/\s\s+/', $delimiter, $line ) ) );
 }
 
+/**
+ * @param $line
+ *
+ * @return mixed
+ */
 function runningContainerName( $line )
 {
-    return end(outputLineToArray( $line ) );
+    $linesArr = outputLineToArray( $line );
+    return end( $linesArr );
 }
 
+/**
+ * @param $line
+ *
+ * @return mixed
+ */
 function runningContainerImageName( $line )
 {
     return ( ( array ) outputLineToArray( $line ) )[1];
